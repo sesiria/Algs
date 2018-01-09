@@ -1,0 +1,81 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "/usr/include",
+                "/usr/local/include",
+                "${workspaceRoot}"
+            ],
+            "defines": [],
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "/usr/include",
+                    "/usr/local/include",
+                    "${workspaceRoot}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
+            "macFrameworkPath": [
+                "/System/Library/Frameworks",
+                "/Library/Frameworks"
+            ]
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "/usr/include",
+                "/usr/local/include",
+                "${workspaceRoot}"
+            ],
+            "defines": [],
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "/usr/include",
+                    "/usr/local/include",
+                    "${workspaceRoot}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        },
+        {  
+            "name": "Win32",  
+            "intelliSenseMode": "clang-x64",  
+            "includePath": [  
+                "${workspaceRoot}",  
+                "D:/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/gcc/x86_64-w64-mingw32/7.2.0/include/c++",  
+                "D:/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/gcc/x86_64-w64-mingw32/7.2.0/include/c++/x86_64-w64-mingw32",  
+                "D:/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/gcc/x86_64-w64-mingw32/7.2.0/include/c++/backward",  
+                "D:/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/gcc/x86_64-w64-mingw32/7.2.0/include",  
+                "D:/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/include",  
+                "D:/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/x86_64-w64-mingw32/include",  
+                "D:/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/gcc/x86_64-w64-mingw32/7.2.0/include-fixed"  
+            ],  
+            "defines": [  
+                "_DEBUG",  
+                "UNICODE",  
+                "__GNUC__=7",  
+                "__cdecl=__attribute__((__cdecl__))"  
+            ],  
+            "browse": {  
+                "path": [  
+                    "${workspaceRoot}",  
+                    "D:/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/gcc/x86_64-w64-mingw32/7.2.0/include/c++",  
+                    "D:/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/gcc/x86_64-w64-mingw32/7.2.0/include/c++/x86_64-w64-mingw32",  
+                    "D:/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/gcc/x86_64-w64-mingw32/7.2.0/include/c++/backward",  
+                    "D:/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/gcc/x86_64-w64-mingw32/7.2.0/include",  
+                    "D:/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/include",  
+                    "D:/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/x86_64-w64-mingw32/include",  
+                    "D:/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/gcc/x86_64-w64-mingw32/7.2.0/include-fixed" 
+                ],  
+                "limitSymbolsToIncludedHeaders": true,  
+                "databaseFilename": ""  
+            }  
+        } 
+    ],
+    "version": 3
+}

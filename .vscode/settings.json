@@ -1,0 +1,48 @@
+{
+    "C_Cpp.clang_format_sortIncludes": true, // 格式化时调整include的顺序（按字母排序）  
+    "C_Cpp.intelliSenseEngine": "Default", // 可以为Default或Tag Parser，后者较老，功能较简单。具体差别参考cpptools插件文档  
+    "C_Cpp.errorSquiggles": "Disabled", // 因为有clang的lint，所以关掉  
+    "editor.formatOnType": true, // 输入时就进行格式化，默认触发字符较少，分号可以触发  
+    "editor.snippetSuggestions": "top", // snippets代码优先显示补全  
+  
+    "clang.cflags": [ // 控制c语言静态检测的参数  
+        "--target=x86_64-w64-mingw",  
+        "-std=c11",  
+        "-Wall"  
+    ],  
+    "clang.cxxflags": [ // 控制c++静态检测时的参数  
+        "--target=x86_64-w64-mingw",  
+        "-std=c++17",  
+        "-Wall"  
+    ],  
+    "clang.completion.enable": false,
+    "files.associations": {
+        "array": "cpp",
+        "initializer_list": "cpp",
+        "string_view": "cpp",
+        "utility": "cpp",
+        "*.tcc": "cpp",
+        "cctype": "cpp",
+        "clocale": "cpp",
+        "cstdint": "cpp",
+        "cstdio": "cpp",
+        "cstdlib": "cpp",
+        "cwchar": "cpp",
+        "cwctype": "cpp",
+        "exception": "cpp",
+        "functional": "cpp",
+        "iosfwd": "cpp",
+        "iostream": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "stdexcept": "cpp",
+        "streambuf": "cpp",
+        "system_error": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "typeinfo": "cpp",
+        "optional": "cpp"
+    } // 效果稍好，但太卡，故关掉  
+}
