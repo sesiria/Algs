@@ -1,24 +1,38 @@
 #include <iostream>
 #include <vector>
 #include <time.h>
+#include <ostream>
+#include "../Lib/Vector.h"
+#include "../Lib/List.h"
 
 
-int findI(const std::vector<int> &a)
+void fun()
 {
-    int low = 1, high = a.size() - 1;
-    while(low <= high)
-    {
-        int mid = (low + high) / 2;
-        if(a[mid] < mid)
 
-
-    }
-    return -1;
 }
-
 
 int main(int argc, char ** argv) 
 {
-    std::vector<int> array = {0, -1, 0, 2, 3, 5, 7, 9, 10};
+    Vector<int> vec(0);
+    List<int> lst;
+    for (int i = 0; i < 10; i++)
+    {
+        vec.push_back(i);
+        lst.push_back(i);
+    }
+        
+    
+    for(auto &X : vec)
+        std::cout << X << " ";
+
+    std::cout << std::endl;
+
+    for(auto &y : lst)
+        std::cout << y << " ";
+
+    List<int>::const_iterator iter;
+    for (iter = lst.begin(); iter != lst.end(); ++iter)
+        std::cout << *iter << std::endl;
+
     return 0;
 }
