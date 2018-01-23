@@ -49,6 +49,7 @@
         "numeric": "cpp",
         "chrono": "cpp",
         "ctime": "cpp",
-        "ratio": "cpp"
+        "ratio": "cpp",
+        "sstream": "cpp"
     } // 效果稍好，但太卡，故关掉  
 }
