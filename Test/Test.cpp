@@ -11,6 +11,7 @@ void fun()
 
 }
 
+
 int main(int argc, char ** argv) 
 {
     Vector<int> vec(0);

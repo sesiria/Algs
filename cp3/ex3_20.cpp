@@ -1,6 +1,11 @@
-#ifndef LIST_H
-#define LIST_H
-
+/*
+ * Exercise 3.20
+ * Author: sesiria  2018
+ * double linklist class. 
+ * Lazy deletion routine for List class
+ * update the code directly in list class.
+ */
+#include <iostream>
 #include <algorithm>
 #include <exception>
 
@@ -32,17 +37,20 @@ class List
             Object  data;       // store the element data.
             Node    *prev;      // point to the previous node.
             Node    *next;      // point to the next node.
+            bool    isDeleted;  // mark that whether the element is deleted.
 
             Node(const Object &d = Object{}, Node *p = nullptr, Node *n = nullptr)
                 : data{d},
                 prev{p},
-                next{n}
+                next{n},
+                isDeleted{false}
             {}
 
             Node(Object && d, Node * p = nullptr, Node * n = nullptr)
                 : data{std::move(d)},
                 prev(p),
-                next{n}
+                next{n},
+                isDeleted{false}
             {}
         };
     
@@ -344,10 +352,12 @@ class List
         // move constructor.
         List(List && rhs)
             : theSize{rhs.theSize},
+            countDeleted{rhs.countDeleted},
             head{rhs.head},
             tail{rhs.tail}
         {
             rhs.theSize = 0;
+            rhs.countDeleted = 0;
             rhs.head = nullptr;
             rhs.tail = nullptr;
         }
@@ -356,9 +366,10 @@ class List
         List & operator= (List && rhs)
         {
             std::swap(theSize, rhs.theSize);
+            std::swap(countDeleted, rhs.countDeleted);
             std::swap(head, rhs.head);
             std::swap(tail, rhs.tail);
-
+            
             return *this;
         }
 
@@ -503,6 +514,9 @@ class List
             iterator retVal{*this, p->next};
             p->prev->next = p->next;
             p->next->prev = p->prev;
+            // if the element has been mark by deleted.
+            if(p->isDeleted == true)
+                countDeleted--;
             delete p;
             theSize--;
 
@@ -548,20 +562,57 @@ class List
             list.theSize = 0;
         }
 
+        // lazy delete rountine.
+        void deleteElement(iterator position)
+        {
+            position.assertIsValid();
+            if(position.theList != this)
+                throw IteratorMismatchException{};
+
+            (*position)->isDeleted = true; // mark as deleted.
+            ++countDeleted;
+
+            lazyDeletion();
+        }
+
       private:
         int     theSize;  // the size of the linklist (number of elements)
+        int     countDeleted;   // count the number of elements be deleted.
         Node    *head;
         Node    *tail;
+        
 
         // init method.
         void init()
         {
             theSize = 0;
+            countDeleted = 0;
             head = new Node;
             tail = new Node;
             head->next = tail;
             tail->prev = head;
         }
+
+        // process lazy deletetion.
+        void lazyDeletion()
+        {
+            if(countDeleted > theSize / 2)
+            {
+                for (auto iter = begin(); iter != end();)
+                {
+                    if((*iter)->isDeleted == true)
+                        iter = erase(iter);
+                    else
+                        ++iter;
+                }
+            }
+        }
 };
 
-#endif
+
+int main(int argc, char **argv)
+{
+    
+
+    return 0;
+}
