@@ -80,10 +80,11 @@ main(int argc, char **argv)
         deque.inject(2 * i + 1);
     }
 
-    while(!deque.empty())
+    Deque<int> deque1 = std::move(deque);
+    while(!deque1.empty())
     {
         int val;
-        deque.pop(val);
+        deque1.pop(val);
         std::cout << val << " ";
     }
     return 0;

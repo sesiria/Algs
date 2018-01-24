@@ -149,7 +149,7 @@ int main(int argc, char **argv)
 
     while (!queue1.empty())
     {
-        std::cout << queue.dequeue() << " ";
+        std::cout << queue1.dequeue() << " ";
     }
     while (!queue2.empty())
     {
