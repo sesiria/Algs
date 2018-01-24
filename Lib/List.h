@@ -4,564 +4,596 @@
 #include <algorithm>
 #include <exception>
 
-class IteratorMismatchException : public std::exception{
-public:
-    virtual const char*
+class IteratorMismatchException : public std::exception
+{
+  public:
+    virtual const char *
     what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
     {
         return "IteratorMismatchException";
     }
 };
 
-class IteratorOutofBoundsException : public std::exception{
-public:
-    virtual const char*
+class IteratorOutofBoundsException : public std::exception
+{
+  public:
+    virtual const char *
     what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
     {
         return "IteratorOutofBoundsException";
     }
 };
 
-template<typename Object>
+class IllegalAccessException : public std::exception
+{
+  public:
+    virtual const char *
+    what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
+    {
+        return "IllegalAccessException";
+    }
+};
+
+template <typename Object>
 class List
 {
-    private:
-        // Nested Node class for List class.
-        struct Node
+  private:
+    // Nested Node class for List class.
+    struct Node
+    {
+        Object data; // store the element data.
+        Node *prev;  // point to the previous node.
+        Node *next;  // point to the next node.
+
+        Node(const Object &d = Object{}, Node *p = nullptr, Node *n = nullptr)
+            : data{d},
+              prev{p},
+              next{n}
         {
-            Object  data;       // store the element data.
-            Node    *prev;      // point to the previous node.
-            Node    *next;      // point to the next node.
+        }
 
-            Node(const Object &d = Object{}, Node *p = nullptr, Node *n = nullptr)
-                : data{d},
-                prev{p},
-                next{n}
-            {}
-
-            Node(Object && d, Node * p = nullptr, Node * n = nullptr)
-                : data{std::move(d)},
-                prev(p),
-                next{n}
-            {}
-        };
-    
-    public:
-        // Nested const_iterator class for List class
-        class const_iterator
+        Node(Object &&d, Node *p = nullptr, Node *n = nullptr)
+            : data{std::move(d)},
+              prev(p),
+              next{n}
         {
-        public:
-            const_iterator() : current{nullptr}
-            {}
+        }
+    };
 
-            const Object & operator* () const
+  public:
+    // Nested const_iterator class for List class
+    class const_iterator
+    {
+      public:
+        const_iterator() : current{nullptr}
+        {
+        }
+
+        const Object &operator*() const
+        {
+            return retrieve();
+        }
+
+        // prefix increament operator
+        const_iterator &operator++()
+        {
+            current = current->next;
+            return *this;
+        }
+
+        // postfix increament operator
+        const_iterator operator++(int)
+        {
+            const_iterator old = *this;
+            ++(*this);
+            return old;
+        }
+
+        // prefix decreament operator
+        // update from exercise3.13
+        const_iterator &operator--()
+        {
+            current = current->prev;
+            return *this;
+        }
+
+        // postfix decreament operator
+        // update from exercise3.13
+        const_iterator operator--(int)
+        {
+            const_iterator old = *this;
+            --(*this);
+            return old;
+        }
+
+        // generate a new iterator with a steps ofk steps from the current iterator.
+        // update from exercise3.14
+        // without boundary check.
+        const_iterator operator+(int k) const
+        {
+            const_iterator advance = *this;
+            for (int i = 0; i < k; ++i)
             {
-                return retrieve();
+                advance.current = advance.current->next;
             }
+            return advance;
+        }
 
-            // prefix increament operator
-            const_iterator & operator++ ()
-            {
-                current = current->next;
-                return *this;
-            }
+        bool operator==(const const_iterator &rhs) const
+        {
+            return current == rhs.current;
+        }
 
-            // postfix increament operator
-            const_iterator operator++ (int)
-            {
-                const_iterator old = *this;
-                ++(*this);
-                return old;
-            }
+        bool operator!=(const const_iterator &rhs) const
+        {
+            return !(*this == rhs);
+        }
 
-            // prefix decreament operator
-            // update from exercise3.13
-            const_iterator &operator--()
-            {
-                current = current->prev;
-                return *this;
-            }
+      protected:
+        const List *theList;
+        Node *current;
 
-            // postfix decreament operator
-            // update from exercise3.13
-            const_iterator operator--(int)
-            {
-                const_iterator old = *this;
-                --(*this);
-                return old;
-            }
+        Object &retrieve() const
+        {
+            return current->data;
+        }
 
-            // generate a new iterator with a steps ofk steps from the current iterator.
-            // update from exercise3.14
-            // without boundary check.
-            const_iterator operator+(int k) const
-            {
-                const_iterator advance = *this;
-                for (int i = 0; i < k; ++i)
-                {
-                    advance.current = advance.current->next;
-                }
-                return advance;
-            }
-
-            bool operator== (const const_iterator & rhs) const
-            {
-                return current == rhs.current;
-            }
-
-            bool operator!= (const const_iterator & rhs) const
-            {
-                return !(*this == rhs);
-            }
-
-          protected:
-            const List *theList;
-            Node * current;
-            
-            Object & retrieve() const
-            {
-                return current->data;
-            }
-
-            // protected implicity constructor for friend/derived class.
-            const_iterator(const List & list, Node * p) 
+        // protected implicity constructor for friend/derived class.
+        const_iterator(const List &list, Node *p)
             : theList{&list}, current{p}
-            {}
-
-            void assertIsValid() const
-            {
-                if(theList == nullptr || current == nullptr || current == theList->head)
-                    throw IteratorOutofBoundsException{};
-            }
-
-            friend class List<Object>;
-        };
-
-        // nested iterator class for List class
-        class iterator : public const_iterator
         {
-        public:
-            iterator()
-            {}
-
-            Object & operator* ()
-            {
-                return const_iterator::retrieve();
-            }
-
-            const Object & operator* () const
-            {
-                return const_iterator::operator*();
-            }
-
-            // prefix increament operator.
-            iterator & operator++()
-            {
-                this->current = this->current->next;
-                return *this;
-            }
-
-            // postfix increament operator.
-            iterator operator++(int)
-            {
-                iterator old = *this;
-                ++(*this);
-                return old;
-            }
-
-            // prefix decreament operator.
-            // update from exercise 3.13
-            iterator & operator--()
-            {
-                this->current = this->current->prev;
-                return *this;
-            }
-
-            // postfix decreament operator.
-            // update from exercise 3.13
-            iterator operator--(int)
-            {
-                iterator old = *this;
-                --(*this);
-                return old;
-            }
-
-            // generate a new iterator with a steps ofk steps from the current iterator.
-            // update from exercise3.14
-            // without boundary check.
-            iterator operator+(int k) const
-            {
-                iterator advance = *this;
-                for (int i = 0; i < k; ++i)
-                {
-                    advance.current = advance.current->next;
-                }
-                return advance;
-            }
-
-          protected:
-            iterator(const List & lst, Node * p) : const_iterator{lst, p}
-            {}
-
-            friend class List<Object>;
-        };
-
-        // Nested const_reverse_iterator class for List class
-        // update from exercise 3_16
-        class const_reverse_iterator
-        {
-        public:
-            const_reverse_iterator() : current{nullptr}
-            {}
-
-            const Object & operator* () const
-            {
-                return retrieve();
-            }
-
-            // prefix increament operator
-            const_reverse_iterator & operator++ ()
-            {
-                current = current->prev;
-                return *this;
-            }
-
-            // postfix increament operator
-            const_reverse_iterator operator++ (int)
-            {
-                const_reverse_iterator old = *this;
-                ++(*this);
-                return old;
-            }
-
-            bool operator== (const const_reverse_iterator & rhs) const
-            {
-                return current == rhs.current;
-            }
-
-            bool operator!= (const const_reverse_iterator & rhs) const
-            {
-                return !(*this == rhs);
-            }
-
-          protected:
-            const List *theList;
-            Node * current;
-            
-            Object & retrieve() const
-            {
-                return current->data;
-            }
-
-            // protected implicity constructor for friend/derived class.
-            const_reverse_iterator(const List & lst, Node * p) 
-            :theList{&lst},
-             current{p}
-            {}
-
-            void assertIsValid() const
-            {
-                if(theList == nullptr || current == nullptr || current == theList->tail)
-                    throw IteratorOutofBoundsException{};
-            }
-
-            friend class List<Object>;
-        };
-
-
-        // nested reverse_iterator class for List class
-        // update from exercise 3_16
-        class reverse_iterator : public const_reverse_iterator
-        {
-        public:
-            reverse_iterator()
-            {}
-
-            Object & operator* ()
-            {
-                return const_reverse_iterator::retrieve();
-            }
-
-            const Object & operator* () const
-            {
-                return const_reverse_iterator::operator*();
-            }
-
-            // prefix increament operator.
-            reverse_iterator & operator++()
-            {
-                this->current = this->current->prev;
-                return *this;
-            }
-
-            // postfix increament operator.
-            reverse_iterator operator++(int)
-            {
-                reverse_iterator old = *this;
-                ++(*this);
-                return old;
-            }
-
-          protected:
-            reverse_iterator(const List &lst, Node * p) : const_reverse_iterator{lst, p}
-            {}
-
-            friend class List<Object>;
-        };
-
-
-    public:
-        // default constructor.
-        List()
-        {
-            init();
         }
 
-        // copy constructor.
-        List(const List & rhs)
+        void assertIsValid() const
         {
-            init();
-            for( auto & x : rhs)
-                push_back(x);
+            if (theList == nullptr || current == nullptr || current == theList->head)
+                throw IteratorOutofBoundsException{};
         }
 
-        // default destructor.
-        ~List()
-        {   
-            clear();
-            delete head;
-            delete tail;
+        friend class List<Object>;
+    };
+
+    // nested iterator class for List class
+    class iterator : public const_iterator
+    {
+      public:
+        iterator()
+        {
         }
 
-        // copy assignment.
-        List & operator= (const List &rhs)
+        Object &operator*()
         {
-            List copy = rhs;
-            std::swap(*this, copy);
+            return const_iterator::retrieve();
+        }
+
+        const Object &operator*() const
+        {
+            return const_iterator::operator*();
+        }
+
+        // prefix increament operator.
+        iterator &operator++()
+        {
+            this->current = this->current->next;
             return *this;
         }
 
-        // move constructor.
-        List(List && rhs)
-            : theSize{rhs.theSize},
-            head{rhs.head},
-            tail{rhs.tail}
+        // postfix increament operator.
+        iterator operator++(int)
         {
-            rhs.theSize = 0;
-            rhs.head = nullptr;
-            rhs.tail = nullptr;
+            iterator old = *this;
+            ++(*this);
+            return old;
         }
 
-        // move assignment.
-        List & operator= (List && rhs)
+        // prefix decreament operator.
+        // update from exercise 3.13
+        iterator &operator--()
         {
-            std::swap(theSize, rhs.theSize);
-            std::swap(head, rhs.head);
-            std::swap(tail, rhs.tail);
-
+            this->current = this->current->prev;
             return *this;
         }
 
-        iterator begin()
+        // postfix decreament operator.
+        // update from exercise 3.13
+        iterator operator--(int)
         {
-            return {*this, head->next};
+            iterator old = *this;
+            --(*this);
+            return old;
         }
 
-        const_iterator begin() const
+        // generate a new iterator with a steps ofk steps from the current iterator.
+        // update from exercise3.14
+        // without boundary check.
+        iterator operator+(int k) const
         {
-            return {*this, head->next};
+            iterator advance = *this;
+            for (int i = 0; i < k; ++i)
+            {
+                advance.current = advance.current->next;
+            }
+            return advance;
         }
 
-        reverse_iterator rbegin()
+      protected:
+        iterator(const List &lst, Node *p) : const_iterator{lst, p}
         {
-            return {*this, tail->prev};
         }
 
-        const_reverse_iterator rbegin() const
+        friend class List<Object>;
+    };
+
+    // Nested const_reverse_iterator class for List class
+    // update from exercise 3_16
+    class const_reverse_iterator
+    {
+      public:
+        const_reverse_iterator() : current{nullptr}
         {
-            return {*this, tail->prev};
         }
 
-        iterator end()
+        const Object &operator*() const
         {
-            return {*this, tail};
+            return retrieve();
         }
 
-        const_iterator end() const
+        // prefix increament operator
+        const_reverse_iterator &operator++()
         {
-            return {*this, tail};
+            current = current->prev;
+            return *this;
         }
 
-        reverse_iterator rend()
+        // postfix increament operator
+        const_reverse_iterator operator++(int)
         {
-            return {*this, head};
+            const_reverse_iterator old = *this;
+            ++(*this);
+            return old;
         }
 
-        const_reverse_iterator rend() const
+        bool operator==(const const_reverse_iterator &rhs) const
         {
-            return {*this, head};
+            return current == rhs.current;
         }
 
-        int size() const
+        bool operator!=(const const_reverse_iterator &rhs) const
         {
-            return theSize;
+            return !(*this == rhs);
         }
 
-        bool empty() const
+      protected:
+        const List *theList;
+        Node *current;
+
+        Object &retrieve() const
         {
-            return size() == 0;
+            return current->data;
         }
 
-        void clear()
+        // protected implicity constructor for friend/derived class.
+        const_reverse_iterator(const List &lst, Node *p)
+            : theList{&lst},
+              current{p}
         {
-            while(!empty())
-                pop_front();
         }
 
-        Object &front()
+        void assertIsValid() const
         {
-            return *begin();
+            if (theList == nullptr || current == nullptr || current == theList->tail)
+                throw IteratorOutofBoundsException{};
         }
 
-        const Object & front() const
+        friend class List<Object>;
+    };
+
+    // nested reverse_iterator class for List class
+    // update from exercise 3_16
+    class reverse_iterator : public const_reverse_iterator
+    {
+      public:
+        reverse_iterator()
         {
-            return *begin();
         }
 
-        Object & back()
+        Object &operator*()
         {
-            return *--end();
+            return const_reverse_iterator::retrieve();
         }
 
-        const Object & back() const
+        const Object &operator*() const
         {
-            return *--end();
+            return const_reverse_iterator::operator*();
         }
 
-        void push_front(const Object & x)
+        // prefix increament operator.
+        reverse_iterator &operator++()
         {
-            insert(begin(), x);
+            this->current = this->current->prev;
+            return *this;
         }
 
-        void push_front(Object && x)
+        // postfix increament operator.
+        reverse_iterator operator++(int)
         {
-            insert(begin(), std::move(x));
+            reverse_iterator old = *this;
+            ++(*this);
+            return old;
         }
 
-        void push_back(const Object & x)
+      protected:
+        reverse_iterator(const List &lst, Node *p) : const_reverse_iterator{lst, p}
         {
-            insert(end(), x);
         }
 
-        void push_back(Object && x)
-        {
-            insert(end(), std::move(x));
-        }
+        friend class List<Object>;
+    };
 
-        void pop_front()
-        {
-            erase(begin());
-        }
+  public:
+    // default constructor.
+    List()
+    {
+        init();
+    }
 
-        void pop_back()
-        {
-            erase(--end());
-        }
+    // copy constructor.
+    List(const List &rhs)
+    {
+        init();
+        for (auto &x : rhs)
+            push_back(x);
+    }
 
-        // insert x before itr.
-        // return the iterator which includes the position of the new generated element.
-        iterator insert(iterator itr, const Object &x)
-        {
-            itr.assertIsValid();
-            if(itr.theList != this)
-                throw IteratorMismatchException{};
-            Node *p = itr.current;
-            theSize++;
-            return {p->prev = p->prev->next = new Node{x, p->prev, p}};
-        }
+    // default destructor.
+    ~List()
+    {
+        clear();
+        delete head;
+        delete tail;
+    }
 
-        // insert x before itr
-        // return the iterator which includes the position of the new generated element.
-        iterator insert(iterator itr, Object && x)
-        {
-            itr.assertIsValid();
-            if(itr.theList != this)
-                throw IteratorMismatchException{};
-            Node *p = itr.current;
-            theSize++;
-            return {*this, p->prev = p->prev->next = new Node{std::move(x), p->prev, p}};            
-        }
+    // copy assignment.
+    List &operator=(const List &rhs)
+    {
+        List copy = rhs;
+        std::swap(*this, copy);
+        return *this;
+    }
 
-        // Erase item at itr.
-        // return the iterator of the next position before delete the element.
-        iterator erase(iterator itr)
-        {
-            itr.assertIsValid();
-            if(itr.theList != this)
-                throw IteratorMismatchException{};
-            Node *p = itr.current;
-            iterator retVal{*this, p->next};
-            p->prev->next = p->next;
-            p->next->prev = p->prev;
-            delete p;
-            theSize--;
+    // move constructor.
+    List(List &&rhs)
+        : theSize{rhs.theSize},
+          head{rhs.head},
+          tail{rhs.tail}
+    {
+        rhs.theSize = 0;
+        rhs.head = nullptr;
+        rhs.tail = nullptr;
+    }
 
-            return retVal;
-        }
+    // move assignment.
+    List &operator=(List &&rhs)
+    {
+        std::swap(theSize, rhs.theSize);
+        std::swap(head, rhs.head);
+        std::swap(tail, rhs.tail);
 
-        iterator erase(iterator from, iterator to)
-        {
-            from.assertIsValid();
-            to.assertIsValid();
-            if(from.theList != this)
-                throw IteratorMismatchException{};
-            if(to.theList != this)
-                throw IteratorMismatchException{};
+        return *this;
+    }
 
-            for (iterator itr = from; itr != to;)
-                itr = erase(itr);
-        }
+    iterator begin()
+    {
+        return {*this, head->next};
+    }
 
-        // update from exercise 3.15
-        // splice list
-        // limitation time O(1)
-        void splice(iterator position, List & list)
-        {
-            // can't splice the same list.
-            position.assertIsValid();
-            if(position.theList != this)
-                throw IteratorMismatchException();
+    const_iterator begin() const
+    {
+        return {*this, head->next};
+    }
 
-            if(this == &list)
-                return;
+    reverse_iterator rbegin()
+    {
+        return {*this, tail->prev};
+    }
 
-            Node *p = position.current;
-            p->prev->next = list.head->next;
-            list.head->next->prev = p->prev;
-            p->prev = list.tail->prev;
-            list.tail->prev->next = p;
-            theSize += list.theSize; // increase the size.
+    const_reverse_iterator rbegin() const
+    {
+        return {*this, tail->prev};
+    }
 
-            // reset the list
-            list.head->next = list.tail;
-            list.tail->prev = list.head;
-            list.theSize = 0;
-        }
+    iterator end()
+    {
+        return {*this, tail};
+    }
 
-      private:
-        int     theSize;  // the size of the linklist (number of elements)
-        Node    *head;
-        Node    *tail;
+    const_iterator end() const
+    {
+        return {*this, tail};
+    }
 
-        // init method.
-        void init()
-        {
-            theSize = 0;
-            head = new Node;
-            tail = new Node;
-            head->next = tail;
-            tail->prev = head;
-        }
+    reverse_iterator rend()
+    {
+        return {*this, head};
+    }
+
+    const_reverse_iterator rend() const
+    {
+        return {*this, head};
+    }
+
+    int size() const
+    {
+        return theSize;
+    }
+
+    bool empty() const
+    {
+        return size() == 0;
+    }
+
+    void clear()
+    {
+        while (!empty())
+            pop_front();
+    }
+
+    Object &front()
+    {
+        if(empty())
+            throw IllegalAccessException{};
+        return *begin();
+    }
+
+    const Object &front() const
+    {
+        if(empty())
+            throw IllegalAccessException{};
+        return *begin();
+    }
+
+    Object &back()
+    {
+        if(empty())
+            throw IllegalAccessException{};
+        return *--end();
+    }
+
+    const Object &back() const
+    {
+        if(empty())
+            throw IllegalAccessException{};
+        return *--end();
+    }
+
+    void push_front(const Object &x)
+    {
+        insert(begin(), x);
+    }
+
+    void push_front(Object &&x)
+    {
+        insert(begin(), std::move(x));
+    }
+
+    void push_back(const Object &x)
+    {
+        insert(end(), x);
+    }
+
+    void push_back(Object &&x)
+    {
+        insert(end(), std::move(x));
+    }
+
+    void pop_front()
+    {
+        if(empty())
+            throw IllegalAccessException{};
+        erase(begin());
+    }
+
+    void pop_back()
+    {
+        if(empty())
+            throw IllegalAccessException{};
+        erase(--end());
+    }
+
+    // insert x before itr.
+    // return the iterator which includes the position of the new generated element.
+    iterator insert(iterator itr, const Object &x)
+    {
+        itr.assertIsValid();
+        if (itr.theList != this)
+            throw IteratorMismatchException{};
+        Node *p = itr.current;
+        theSize++;
+        return {*this, p->prev = p->prev->next = new Node{x, p->prev, p}};
+    }
+
+    // insert x before itr
+    // return the iterator which includes the position of the new generated element.
+    iterator insert(iterator itr, Object &&x)
+    {
+        itr.assertIsValid();
+        if (itr.theList != this)
+            throw IteratorMismatchException{};
+        Node *p = itr.current;
+        theSize++;
+        return {*this, p->prev = p->prev->next = new Node{std::move(x), p->prev, p}};
+    }
+
+    // Erase item at itr.
+    // return the iterator of the next position before delete the element.
+    iterator erase(iterator itr)
+    {
+        itr.assertIsValid();
+        if (itr.theList != this)
+            throw IteratorMismatchException{};
+        Node *p = itr.current;
+        iterator retVal{*this, p->next};
+        p->prev->next = p->next;
+        p->next->prev = p->prev;
+        delete p;
+        theSize--;
+
+        return retVal;
+    }
+
+    iterator erase(iterator from, iterator to)
+    {
+        from.assertIsValid();
+        to.assertIsValid();
+        if (from.theList != this)
+            throw IteratorMismatchException{};
+        if (to.theList != this)
+            throw IteratorMismatchException{};
+
+        for (iterator itr = from; itr != to;)
+            itr = erase(itr);
+    }
+
+    // update from exercise 3.15
+    // splice list
+    // limitation time O(1)
+    void splice(iterator position, List &list)
+    {
+        // can't splice the same list.
+        position.assertIsValid();
+        if (position.theList != this)
+            throw IteratorMismatchException();
+
+        if (this == &list)
+            return;
+
+        Node *p = position.current;
+        p->prev->next = list.head->next;
+        list.head->next->prev = p->prev;
+        p->prev = list.tail->prev;
+        list.tail->prev->next = p;
+        theSize += list.theSize; // increase the size.
+
+        // reset the list
+        list.head->next = list.tail;
+        list.tail->prev = list.head;
+        list.theSize = 0;
+    }
+
+  private:
+    int theSize; // the size of the linklist (number of elements)
+    Node *head;
+    Node *tail;
+
+    // init method.
+    void init()
+    {
+        theSize = 0;
+        head = new Node;
+        tail = new Node;
+        head->next = tail;
+        tail->prev = head;
+    }
 };
 
 #endif
