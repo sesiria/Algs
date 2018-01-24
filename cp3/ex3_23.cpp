@@ -259,7 +259,7 @@ int main(int argc, char **argv)
 {
     buildOperatorPriority();
     std::string expr = "4.99 * 1.06 - 5.99 / 6.99 * 1.06";
-    std::string exp1 = "a - b - c";
+    std::string exp1 = "a + b * c + (d * e + f) * g";
     std::string exp2 = "2 ^ (3 + 2) ^ 4";
     std::string exp3 = "(1 + (2) + 4)";
     std::cout << infixToPostfix(expr) << std::endl;
@@ -268,6 +268,6 @@ int main(int argc, char **argv)
     std::cout << postfixToInfix(infixToPostfix(expr)) << std::endl;
     std::cout << postfixToInfix(infixToPostfix(exp1)) << std::endl;
     std::cout << postfixToInfix(infixToPostfix(exp2)) << std::endl;
-    std::cout << postfixToInfix(infixToPostfix(exp3)) << std::endl;
+    std::cout << postfixToInfix("6 5 2 3 + 8 * + 3 + *") << std::endl;
     return 0;
 }
