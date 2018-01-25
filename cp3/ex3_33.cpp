@@ -61,10 +61,7 @@ class Queue
     // enqueue a new element to the back of Queue.
     void enqueue(const Object &x)
     {
-        if(back == (theCapacity - 1))
-            back = 0;
-        else
-            back++;
+        back = (back + 1) % theCapacity;
         theArray[back] = x;
         theSize++;
     }
@@ -75,10 +72,7 @@ class Queue
         if(empty())
             throw QueueUnderflowException{};
         Object val = theArray[front];
-        if(front == (theCapacity - 1))
-            front = 0;
-        else
-            front++;
+        front = (front + 1) % theCapacity;
 
         theSize--;
         return val;
