@@ -251,7 +251,11 @@ std::string postfixToInfix(const std::string &str)
             break;
         }
     }
-    output = exprStack.top().expr;
+    // handle for empty input.
+    if(exprStack.empty())
+        output = "";
+    else
+        output = exprStack.top().expr;
     return output;
 }
 

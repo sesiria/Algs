@@ -9,7 +9,7 @@ public:
     // one parameter constructor.
     explicit Vector(int initSize = 0)
         : theSize{initSize},
-        theCapacity{theSize < SPARE_CAPACITY ? SPARE_CAPACITY : SPARE_CAPACITY * 2}
+        theCapacity{theSize < SPARE_CAPACITY ? SPARE_CAPACITY : theSize * 2}
     {
         objects = new Object[theCapacity];
     }
