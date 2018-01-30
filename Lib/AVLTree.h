@@ -1,38 +1,38 @@
-#ifndef BINARYSEARCHTREE_H
-#define BINARYSEARCHTREE_H
+#ifndef AvlTree_H
+#define AvlTree_H
 
 #include <algorithm>
 #include <iostream>
 #include <ostream>
 
 template <typename Comparable>
-class BinarySearchTree
+class AvlTree
 {
 
   public:
-    BinarySearchTree() = default;
+    AvlTree() = default;
 
     /**
      * Copy constructor
-     */ 
-    BinarySearchTree(const BinarySearchTree &rhs)
+     */
+    AvlTree(const AvlTree &rhs)
     {
         root = clone(rhs.root);
     }
 
     /**
      * Move constructor
-     */ 
-    BinarySearchTree(BinarySearchTree &&rhs)
-        :root{rhs.root}
+     */
+    AvlTree(AvlTree &&rhs)
+        : root{rhs.root}
     {
         rhs.root = nullptr;
     }
 
     /**
      * Destructor for the tree
-     */ 
-    ~BinarySearchTree()
+     */
+    ~AvlTree()
     {
         makeEmpty();
     }
@@ -81,37 +81,39 @@ class BinarySearchTree
         remove(x, root);
     }
 
-    BinarySearchTree &operator=(const BinarySearchTree &rhs)
+    AvlTree &operator=(const AvlTree &rhs)
     {
-        BinarySearchTree copy = rhs;
+        AvlTree copy = rhs;
         std::swap(*this, copy);
         return *this;
     }
 
-    BinarySearchTree &operator=(BinarySearchTree &&rhs)
+    AvlTree &operator=(AvlTree &&rhs)
     {
         std::swap(root, rhs.root);
     }
 
   private:
-    struct BinaryNode
+    struct AvlNode
     {
         Comparable element;
-        BinaryNode *left;
-        BinaryNode *right;
+        AvlNode *left;
+        AvlNode *right;
+        int height;
 
-        BinaryNode(const Comparable &theElement, BinaryNode *lt, BinaryNode *rt)
-            : element{theElement}, left{lt}, right{rt}
+        AvlNode(const Comparable &theElement, AvlNode *lt, AvlNode *rt, int h = 0)
+            : element{theElement}, left{lt}, right{rt}, height{h}
         {
         }
 
-        BinaryNode(Comparable &&theElement, BinaryNode *lt, BinaryNode *rt)
-            : element{std::move(theElement)}, left{lt}, right{rt}
+        AvlNode(Comparable &&theElement, AvlNode *lt, AvlNode *rt)
+            : element{std::move(theElement)}, left{lt}, right{rt}, height{h}
         {
         }
     };
 
-    BinaryNode *root; // pointer to the root node of the BinarySearchTree
+    AvlNode *root; // pointer to the root node of the AvlTree
+    static const int ALLOWED_IMBALANCE = 1;
 
     // private member for recursive calling.
     /**
@@ -120,34 +122,37 @@ class BinarySearchTree
      * t is the node that roots the subtree.
      * Set the new root of the subtree.
      */
-    void insert(const Comparable &x, BinaryNode *&t)
+    void insert(const Comparable &x, AvlNode *&t)
     {
-        if(t == nullptr)
-            t = new BinaryNode{x, nullptr, nullptr};
-        else if(x < t->element)
+        if (t == nullptr)
+            t = new AvlNode{x, nullptr, nullptr};
+        else if (x < t->element)
             insert(x, t->left);
-        else if(t->element < x)
+        else if (t->element < x)
             insert(x, t->right);
         else
             ; // Duplicate; do nothiing
+
+        balance(t);
     }
-    
+
     /**
      * Internal method to insert into a subtree.
      * x is the item to insert.
      * t is the node that roots the subtree.
      * Set the new root of the subtree.
      */
-    void insert(Comparable &&x, BinaryNode *&t)
+    void insert(Comparable &&x, AvlNode *&t)
     {
-        if(t == nullptr)
-            t = new BinaryNode{std::move(x), nullptr, nullptr};
-        else if(x < t->element)
+        if (t == nullptr)
+            t = new AvlNode{std::move(x), nullptr, nullptr};
+        else if (x < t->element)
             insert(std::move(x), t->left);
-        else if(t->element < x)
+        else if (t->element < x)
             insert(std::move(x), t->right);
         else
             ; // Duplicate; do nothiing
+        balance(t);
     }
 
     /**
@@ -155,23 +160,23 @@ class BinarySearchTree
      * x is the item to remove.
      * t is the node that roots the subtree.
      * Set the new root of the subtree.
-     */ 
-    void remove(const Comparable &x, BinaryNode *&t)
+     */
+    void remove(const Comparable &x, AvlNode *&t)
     {
-        if(t == nullptr)
+        if (t == nullptr)
             return; // item not found; do nothing
-        if(x < t->element)
+        if (x < t->element)
             remove(x, t->left);
         else if (t->element < x)
             remove(x, t->right);
-        else if(t->left != nullptr && t->right != nullptr)  // two children
+        else if (t->left != nullptr && t->right != nullptr) // two children
         {
             t->element = findMin(t->right)->element;
             remove(t->element, t->right);
         }
-        else    // one children or none children
+        else // one children or none children
         {
-            BinaryNode *oldNode = t;
+            AvlNode *oldNode = t;
             t = (t->left != nullptr) ? t->left : t->right;
             delete oldNode;
         }
@@ -180,12 +185,12 @@ class BinarySearchTree
     /**
      * Internal method to find the smallest item in a subtree t.
      * Return code containing the smallest item.
-     */ 
-    BinaryNode *findMin(BinaryNode *t) const
+     */
+    AvlNode *findMin(AvlNode *t) const
     {
-        if(t == nullptr)
+        if (t == nullptr)
             return nullptr;
-        if(t->left == nullptr)
+        if (t->left == nullptr)
             return t;
         return findMin(t->left);
     }
@@ -193,11 +198,11 @@ class BinarySearchTree
     /**
      * Internal method to find the largest item in a subtree t.
      * Return node containing the largetst item.
-     */ 
-    BinaryNode *findMax(BinaryNode *t) const
+     */
+    AvlNode *findMax(AvlNode *t) const
     {
-        if(t != nullptr)
-            while(t->right != nullptr)
+        if (t != nullptr)
+            while (t->right != nullptr)
                 t = t->right;
         return t;
     }
@@ -207,7 +212,7 @@ class BinarySearchTree
      * x is item to search for.
      * t is the node that roots the subtree.
      */
-    bool contains(const Comparable &x, BinaryNode *t) const
+    bool contains(const Comparable &x, AvlNode *t) const
     {
         if (t == nullptr)
             return false;
@@ -216,14 +221,14 @@ class BinarySearchTree
         else if (t->element < x)
             return contains(x, t->right);
         else
-            return true;        // Match
+            return true; // Match
     }
     /**
      * Internal method to make subtree empty.
-     */ 
-    void makeEmpty(BinaryNode *&t)
+     */
+    void makeEmpty(AvlNode *&t)
     {
-        if(t != nullptr)
+        if (t != nullptr)
         {
             makeEmpty(t->left);
             makeEmpty(t->right);
@@ -231,21 +236,76 @@ class BinarySearchTree
         }
         t = nullptr;
     }
-    
-    void printTree(BinaryNode *t, std::ostream &out) const
-    {
 
+    void printTree(AvlNode *t, std::ostream &out) const
+    {
     }
 
     /**
      * Internal method to clone subtree.
-     */ 
-    BinaryNode *clone(BinaryNode *t) const
+     */
+    AvlNode *clone(AvlNode *t) const
     {
-        if(t == nullptr)
+        if (t == nullptr)
             return nullptr;
         else
-            return new BinaryNode{t->element, clone(t->left), clone(t->right)};
+            return new AvlNode{t->element, clone(t->left), clone(t->right)};
+    }
+
+    /**
+     * Return the height of node t or -1 if nullptr.
+     */
+    int height(AvlNode *t) const
+    {
+        return t == nullptr ? -1 : t->height;
+    }
+
+    /**
+     * Assume t is balanced or within one of being balanced
+     */
+    void balance(AvlNode *&t)
+    {
+        if (t == nullptr)
+            return;
+
+        if (height(t->left) - height(t->right) > ALLOWED_IMBALANCE)
+        {
+            if (height(t->left->left) >= height(t->left->right))
+            {
+                rotateWithLeftChild(t);
+            }
+            else
+            {
+                doubleWithLeftChild(t);
+            }
+        }
+        else if (height(t->right) - height(t->left) > ALLOWED_IMBALANCE)
+        {
+            if (height(t->right->right) >= height(t->right->left))
+            {
+                rotateWithRightChild(t);
+            }
+            else
+            {
+                doubleWithRightChild(t);
+            }
+        }
+        t->height = max(height(t->left), height(t->right)) + 1;
+    }
+
+    /**
+     * Rotate binary tree node with left child.
+     * For AVL trees, this is a single rotation for case1.
+     * Update heights, then set new root.
+     */
+    void rotateWithLeftChild(AvlNode * & k2) 
+    {
+        AvlNode *k1 = k2->left;
+        k2->left = k1->right;
+        k1->right = k2;
+        k2->height = max(height(k2->left), height(k2->right)) + 1;
+        k1->height = max(height(k1->left), height(k2)) + 1;
+        k2 = k1;
     }
 };
 
