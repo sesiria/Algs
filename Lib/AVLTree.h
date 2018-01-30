@@ -106,7 +106,7 @@ class AvlTree
         {
         }
 
-        AvlNode(Comparable &&theElement, AvlNode *lt, AvlNode *rt)
+        AvlNode(Comparable &&theElement, AvlNode *lt, AvlNode *rt, int h = 0)
             : element{std::move(theElement)}, left{lt}, right{rt}, height{h}
         {
         }
@@ -180,6 +180,8 @@ class AvlTree
             t = (t->left != nullptr) ? t->left : t->right;
             delete oldNode;
         }
+
+        balance(t);
     }
 
     /**
@@ -223,6 +225,7 @@ class AvlTree
         else
             return true; // Match
     }
+
     /**
      * Internal method to make subtree empty.
      */
@@ -249,7 +252,7 @@ class AvlTree
         if (t == nullptr)
             return nullptr;
         else
-            return new AvlNode{t->element, clone(t->left), clone(t->right)};
+            return new AvlNode{t->element, clone(t->left), clone(t->right), t->height};
     }
 
     /**
@@ -270,7 +273,7 @@ class AvlTree
 
         if (height(t->left) - height(t->right) > ALLOWED_IMBALANCE)
         {
-            if (height(t->left->left) >= height(t->left->right))
+            if (height(t->left->left) >= height(t->left->right))    // the equal is occur when delete nodes.
             {
                 rotateWithLeftChild(t);
             }
@@ -281,7 +284,7 @@ class AvlTree
         }
         else if (height(t->right) - height(t->left) > ALLOWED_IMBALANCE)
         {
-            if (height(t->right->right) >= height(t->right->left))
+            if (height(t->right->right) >= height(t->right->left))  // the equal is occur when delete nodes.
             {
                 rotateWithRightChild(t);
             }
@@ -304,8 +307,47 @@ class AvlTree
         k2->left = k1->right;
         k1->right = k2;
         k2->height = max(height(k2->left), height(k2->right)) + 1;
-        k1->height = max(height(k1->left), height(k2)) + 1;
+        k1->height = max(height(k1->left), height(k1->right)) + 1;
         k2 = k1;
+    }
+
+    /**
+     * Rotate binary tree node with right child.
+     * For AVL trees, this is a single rotation for case4.
+     * Update heights, then set new root.
+     */ 
+    void rotateWithRightChild(AvlNode * & k2)
+    {
+        AvlNode *k1 = k2->right;
+        k2->right = k1->left;
+        k1->left = k2;
+        k2->height = max(height(k2->left), height(k2->right)) + 1;
+        k1->height = max(height(k1->left), height(k1->right)) + 1;
+        k2 = k1;
+    }
+
+    /**
+     * Double rotate binary tree node: first left child
+     * with its right child; then node k3 with new left child.
+     * For AVL trees, this is a double rotation for case 2.
+     * Update heights, then set new root.
+     */
+    void doubleWithLeftChild(AvlNode * & k3) 
+    {
+        rotateWithRightChild(k3->left);
+        rotateWithLeftChild(k3);
+    }
+
+    /**
+     * Double rotate binary tree node: first left child
+     * with its right child; then node k3 with new left child.
+     * For AVL trees, this is a double rotation for case 2.
+     * Update heights, then set new root.
+     */
+    void doubleWithRightChild(AvlNode * & k3) 
+    {
+        rotateWithLeftChild(k3->right);
+        rotateWithRightChild(k3);
     }
 };
 

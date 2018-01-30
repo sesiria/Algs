@@ -2,12 +2,11 @@
 #include <vector>
 #include <time.h>
 #include <ostream>
-#include "../Lib/BinarySearchTree.h"
+#include "../Lib/AVLTree.h"
 
 
 int main(int argc, char ** argv) 
 {
-
-    BinarySearchTree<int> btree;
+    AvlTree<int> tree;
     return 0;
 }
