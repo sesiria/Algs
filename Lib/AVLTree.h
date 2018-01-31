@@ -57,9 +57,15 @@ class AvlTree
         return (root == nullptr);
     }
 
+    /**
+     * Print the tree contents in sorted order.
+     */ 
     void printTree(std::ostream &out = std::cout) const
     {
-        printTree(root, out);
+        if(isEmpty())
+            out << "Empty tree" << std::endl;
+        else
+            printTree(root, out);
     }
 
     void makeEmpty()
@@ -240,9 +246,19 @@ class AvlTree
         t = nullptr;
     }
 
+    /**
+     * Internal method to print a subtree rooted at t in sorted order.
+     */ 
     void printTree(AvlNode *t, std::ostream &out) const
     {
+        if(t != nullptr)
+        {
+            printTree(t->left, out);
+            out << t->element << std::endl;
+            printTree(t->right, out);
+        }
     }
+
 
     /**
      * Internal method to clone subtree.

@@ -57,9 +57,15 @@ class BinarySearchTree
         return (root == nullptr);
     }
 
+    /**
+     * Print the tree contents in sorted order.
+     */ 
     void printTree(std::ostream &out = std::cout) const
     {
-        printTree(root, out);
+        if(isEmpty())
+            out << "Empty tree" << std::endl;
+        else
+            printTree(root, out);
     }
 
     void makeEmpty()
@@ -231,10 +237,18 @@ class BinarySearchTree
         }
         t = nullptr;
     }
-    
+
+    /**
+     * Internal method to print a subtree rooted at t in sorted order.
+     */ 
     void printTree(BinaryNode *t, std::ostream &out) const
     {
-
+        if(t != nullptr)
+        {
+            printTree(t->left, out);
+            out << t->element << std::endl;
+            printTree(t->right, out);
+        }
     }
 
     /**
@@ -246,6 +260,18 @@ class BinarySearchTree
             return nullptr;
         else
             return new BinaryNode{t->element, clone(t->left), clone(t->right)};
+    }
+
+    /**
+     * Internal method to compute the height of a subtree rooted at t.
+     * Note thte the defintion of the leaf node with height 0.
+     */ 
+    int height(BinaryNode * t)
+    {
+        if(t == nullptr)
+            return -1;
+        else
+            return 1 + max(height(t->left), height(t->right));
     }
 };
 
