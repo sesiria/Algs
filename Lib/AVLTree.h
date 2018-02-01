@@ -248,6 +248,7 @@ class AvlTree
 
     /**
      * Internal method to print a subtree rooted at t in sorted order.
+     * Inorder traversal.
      */ 
     void printTree(AvlNode *t, std::ostream &out) const
     {
