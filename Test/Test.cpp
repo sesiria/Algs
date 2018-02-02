@@ -27,7 +27,7 @@ int random(int num)
 
 int main(int argc, char **argv)
 {
-    printf("Randomize test 1,000,000 of rand01 result:\n");
+    printf("Randomly test 1,000,000 of rand01 result:\n");
 
     long long  resultN[N + 1] = {0};
     for (long long i = 0; i < 1000000; ++i)
