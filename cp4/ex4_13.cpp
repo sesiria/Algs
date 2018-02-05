@@ -1,9 +1,10 @@
 /*
- * Exercise 4.11
+ * Exercise 4.13
  * Author: sesiria  2018
  * An implementation of set Class. Actually we need to use the red-black tree.
  * But the detail is discussed in Chapter 12.
- * We use the normal BinarySearchTree to instead.
+ * We use the normal BinarySearchTree to instead. With link to the next and previous node
+ * And the head and tail node.
  */
 #include <algorithm>
 #include <assert.h>
@@ -18,15 +19,16 @@ class Set
         Comparable element;
         BinaryNode *left;
         BinaryNode *right;
-        BinaryNode *parent;
+        BinaryNode *prev;
+        BinaryNode *next;
 
-        BinaryNode(const Comparable &theElement, BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *pa = nullptr)
-            : element{theElement}, left{lt}, right{rt}, parent{pa}
+        BinaryNode(const Comparable &theElement, BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *p = nullptr, BinaryNode *n = nullptr)
+            : element{theElement}, left{lt}, right{rt}, prev{p}, next{n}
         {
         }
 
-        BinaryNode(Comparable &&theElement, BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *pa = nullptr)
-            : element{std::move(theElement)}, left{lt}, right{rt}, parent{pa}
+        BinaryNode(Comparable &&theElement, BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *p = nullptr, BinaryNode *n = nullptr)
+            : element{std::move(theElement)}, left{lt}, right{rt}, prev{p}, next{n}
         {
         }
     };
@@ -48,22 +50,7 @@ class Set
         // prefix increament operator
         const_iterator &operator++()
         {
-            if (current->right)
-            {
-                BinaryNode *t = current->right;
-                while (t->left != nullptr)
-                    t = t->left;
-                current = t;
-            }
-            else
-            {
-                BinaryNode *t = current->parent;
-                // found an parent to traversal next.
-                // the element of parent must great then current.
-                while (t && t->element < current->element)
-                    t = t->parent;
-                current = t;
-            }
+            current = current->next;
             return *this;
         }
 
@@ -78,22 +65,7 @@ class Set
         // prefix decreament operator
         const_iterator &operator--()
         {
-            if (current->left)
-            {
-                BinaryNode *t = current;
-                while (t->left != nullptr)
-                    t = t->left;
-                current = t;
-            }
-            else
-            {
-                BinaryNode *t = current->parent;
-                // found the parent to traversal previous.
-                // the element of the parent must less then the current.
-                while (t && current->element < t->element)
-                    t = t->parent;
-                current = t;
-            }
+            current = current->prev;
             return *this;
         }
 
@@ -153,22 +125,7 @@ class Set
         // prefix increament operator.
         iterator &operator++()
         {
-            if (this->current->right)
-            {
-                BinaryNode *t = this->current->right;
-                while (t->left != nullptr)
-                    t = t->left;
-                this->current = t;
-            }
-            else
-            {
-                BinaryNode *t = this->current->parent;
-                // found an parent to traversal next.
-                // the element of parent must great then current.
-                while (t && t->element < this->current->element)
-                    t = t->parent;
-                this->current = t;
-            }
+            this->current = this->current->next;
             return *this;
         }
 
@@ -183,22 +140,7 @@ class Set
         // prefix decreament operator.
         iterator &operator--()
         {
-            if (this->current->left)
-            {
-                BinaryNode *t = this->current;
-                while (t->left != nullptr)
-                    t = t->left;
-                this->current = t;
-            }
-            else
-            {
-                BinaryNode *t = this->current->parent;
-                // found the parent to traversal previous.
-                // the element of the parent must less then the current.
-                while (t && this->current->element < t->element)
-                    t = t->parent;
-                this->current = t;
-            }
+            this->current = this->current->prev;
             return *this;
         }
 
@@ -222,22 +164,24 @@ class Set
     // the big-five member function
     // constructor.
     Set()
-        : theSize{0},
-          root{nullptr}
     {
+        init();
     }
 
     // destructor.
     ~Set()
     {
         clear();
+        delete head;
+        delete tail;
     }
 
     // copy constructor.
     Set(const Set &rhs)
-        : theSize{rhs.theSize}
     {
-        clone(root, nullptr, rhs.root);
+        init();
+        for (auto &x : rhs)
+            insert(x);
     }
 
     // copy assignment
@@ -251,10 +195,14 @@ class Set
     // move constructor.
     Set(Set &&rhs)
         : theSize{rhs.theSize},
-          root{rhs.root}
+          root{rhs.root},
+          head{rhs.head},
+          tail{rhs.tail}
     {
         rhs.theSize = 0;
         rhs.root = nullptr;
+        rhs.head = nullptr;
+        rhs.tail = nullptr;
     }
 
     // move assignment
@@ -262,6 +210,8 @@ class Set
     {
         std::swap(theSize, rhs.theSize);
         std::swap(root, rhs.root);
+        std::swap(head, rhs.head);
+        std::swap(tail, rhs.tail);
     }
 
     int size() const
@@ -281,43 +231,46 @@ class Set
 
     iterator begin()
     {
-        return {findMin(root)};
+        return {head->next};
     }
 
     const_iterator begin() const
     {
-        return {findMin(root)};
+        return {head->next};
     }
 
     iterator end()
     {
-        return {nullptr};
+        return {tail};
     }
 
     const_iterator end() const
     {
-        return {nullptr};
+        return {tail};
     }
 
     // public member.
     iterator insert(const Comparable &x)
     {
-        return insert(x, root, nullptr);
+        return insert(x, root, head, tail);
     }
 
     iterator insert(iterator hint, const Comparable &x)
     {
         BinaryNode *node = hint.current;
         // check legal.
-        if (node && node->parent)
+        if (node && node->next && node->prev)
         {
-            if (node->element < node->parent->element && x < node->parent->element)
-                return insert(x, node, node->parent);
-            else if (node->parent->element < node->element && node->parent->element < x)
-                return insert(x, node, node->parent);
+            // prev < x < node
+            if (x < node->element && node->prev->element < x)
+                return insert(x, node->left, node->prev, node);
+
+            // node < x < next
+            else if (node->element < x && x < node->next->element)
+                return insert(x, node->right, node, node->next);
         }
-        else
-            return insert(x);
+        // normal insert
+        return insert(x);
     }
 
     int erase(const Comparable &x)
@@ -330,13 +283,9 @@ class Set
         BinaryNode *p = itr.current;
         if (p)
         { // we must update the link to the parent.
-            if (p->parent)
-                return {remove(p->element,
-                               p->element < p->parent->element ? p->parent->left : p->parent->right)};
-            else // the node have no parent , so it is the root.
-                return {remove(p->element, root)};
+            return {remove(p->element, p)};
         }
-        return {nullptr};
+        return itr; // didn't remove anything.
     }
 
     iterator erase(iterator start, iterator end)
@@ -350,32 +299,35 @@ class Set
   private:
     int theSize;
     BinaryNode *root; // pointer to the root node of the BinarySearchTree
+    BinaryNode *head;
+    BinaryNode *tail;
+
+    // init method.
+    void init()
+    {
+        theSize = 0;
+        root = nullptr;
+        head = new BinaryNode{Comparable{}};
+        tail = new BinaryNode{Comparable{}};
+        head->next = tail;
+        tail->prev = head;
+    }
 
     // private insert method.
     iterator insert(const Comparable &x,
-                    BinaryNode *&t,
-                    BinaryNode *parent)
+                    BinaryNode *&t, BinaryNode *prev, BinaryNode *next)
     {
         if (t == nullptr)
         {
             theSize++; // increase the size.
-            return {t = new BinaryNode{x, nullptr, nullptr, parent}};
+            return {next->prev = prev->next = t = new BinaryNode{x, nullptr, nullptr, prev, next}};
         }
         else if (x < t->element)
-            return insert(x, t->left, t);
+            return insert(x, t->left, prev, t);
         else if (t->element < x)
-            return insert(x, t->right, t);
+            return insert(x, t->right, t, next);
 
         return {t}; // already existed.
-    }
-
-    void clone(BinaryNode *&t, BinaryNode *pa, BinaryNode *r)
-    {
-        if (r == nullptr)
-            return;
-        t = new BinaryNode{r->element, nullptr, nullptr, pa};
-        clone(t->left, t, r->left);
-        clone(t->right, t, r->right);
     }
 
     /**
@@ -440,14 +392,12 @@ class Set
         else // one children or none children
         {
             BinaryNode *oldNode = t;
-            iterator itr{t};
-            ++itr;
-            if (t->left)
-                t->left->parent = t->parent; // update parent
-            else if (t->right)
-                t->right->parent = t->parent; // update parent
+            iterator itr{t->next};
+            // relink double-linklist
+            t->prev->next = t->next;
+            t->next->prev = t->prev;
+            // relink binarytree
             t = (t->left != nullptr) ? t->left : t->right;
-
             delete oldNode;
             --theSize;
             return itr.current;
@@ -457,7 +407,7 @@ class Set
 
 int main(int argc, char **argv)
 {
-    int a[] = {5, 4, 3, 7, 9, 12, 6, 14, 1, 8};
+    int a[] = {5, 4, 3, 7, 9, 12, 6, 1, 14, 8};
     Set<int> trees;
     for (int i = 0; i < _countof(a); ++i)
         trees.insert(a[i]);
@@ -467,14 +417,17 @@ int main(int argc, char **argv)
         std::cout << *iter << " ";
     std::cout << std::endl;
 
+    trees.insert(--trees.end(), 15);
+
     Set<int> tree1 = trees;
+
     tree1.erase(5);
     tree1.erase(1);
     tree1.erase(14);
     tree1.erase(8);
     tree1.erase(0);
     tree1.erase(1);
-    for (auto &x : tree1) // test range loop
+    for (auto &x : tree1)
         std::cout << x << " ";
     std::cout << std::endl;
 

@@ -1,7 +1,7 @@
 /*
- * Exercise 4.11
+ * Exercise 4.12
  * Author: sesiria  2018
- * An implementation of set Class. Actually we need to use the red-black tree.
+ * An implementation of map Class. Actually we need to use the red-black tree.
  * But the detail is discussed in Chapter 12.
  * We use the normal BinarySearchTree to instead.
  */
@@ -9,23 +9,52 @@
 #include <assert.h>
 #include <iostream>
 
-template <typename Comparable>
-class Set
+template <typename KeyType, typename ValueType>
+struct Pair
+{
+    KeyType first;
+    ValueType second;
+
+    bool operator<(const Pair<KeyType, ValueType> &rhs) const
+    {
+        return first < rhs.first;
+    }
+
+    //Pair& operator
+
+    bool operator<(const KeyType &key)
+    {
+        return first < key;
+    }
+
+    Pair(const KeyType &key, const ValueType &val)
+        : first{key}, second{val}
+    {
+    }
+
+    Pair(KeyType &&key, ValueType &&val)
+        : first{std::move(key)}, second{std::move(val)}
+    {
+    }
+};
+
+template <typename KeyType, typename ValueType>
+class Map
 {
   private:
     struct BinaryNode
     {
-        Comparable element;
+        Pair<KeyType, ValueType> element;
         BinaryNode *left;
         BinaryNode *right;
         BinaryNode *parent;
 
-        BinaryNode(const Comparable &theElement, BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *pa = nullptr)
+        BinaryNode(const Pair<KeyType, ValueType> &theElement, BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *pa = nullptr)
             : element{theElement}, left{lt}, right{rt}, parent{pa}
         {
         }
 
-        BinaryNode(Comparable &&theElement, BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *pa = nullptr)
+        BinaryNode(KeyType &&theElement, BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *pa = nullptr)
             : element{std::move(theElement)}, left{lt}, right{rt}, parent{pa}
         {
         }
@@ -40,9 +69,14 @@ class Set
         {
         }
 
-        const Comparable &operator*() const
+        const Pair<KeyType, ValueType> &operator*() const
         {
             return retrieve();
+        }
+
+        const Pair<KeyType, ValueType> *operator->() const
+        {
+            return &retrieve();
         }
 
         // prefix increament operator
@@ -118,7 +152,7 @@ class Set
       protected:
         BinaryNode *current;
 
-        Comparable &retrieve() const
+        Pair<KeyType, ValueType> &retrieve() const
         {
             return current->element;
         }
@@ -129,10 +163,10 @@ class Set
         {
         }
 
-        friend class Set<Comparable>;
+        friend class Map<KeyType, ValueType>;
     };
 
-    // nested iterator class for Set class
+    // nested iterator class for Map class
     class iterator : public const_iterator
     {
       public:
@@ -140,14 +174,24 @@ class Set
         {
         }
 
-        Comparable &operator*()
+        Pair<KeyType, ValueType> &operator*()
         {
             return const_iterator::retrieve();
         }
 
-        const Comparable &operator*() const
+        const Pair<KeyType, ValueType> &operator*() const
         {
             return const_iterator::operator*();
+        }
+
+        Pair<KeyType, ValueType>* operator->()
+        {
+            return &const_iterator::retrieve();
+        }
+
+        const Pair<KeyType, ValueType>* operator->() const
+        {
+            return const_iterator::operator->();
         }
 
         // prefix increament operator.
@@ -215,41 +259,41 @@ class Set
         {
         }
 
-        friend class Set<Comparable>;
+        friend class Map<KeyType, ValueType>;
     };
 
   public:
     // the big-five member function
     // constructor.
-    Set()
+    Map()
         : theSize{0},
           root{nullptr}
     {
     }
 
     // destructor.
-    ~Set()
+    ~Map()
     {
         clear();
     }
 
     // copy constructor.
-    Set(const Set &rhs)
+    Map(const Map &rhs)
         : theSize{rhs.theSize}
     {
         clone(root, nullptr, rhs.root);
     }
 
     // copy assignment
-    Set &operator=(const Set &rhs)
+    Map &operator=(const Map &rhs)
     {
-        Set copy = rhs;
+        Map copy = rhs;
         std::swap(*this, copy);
         return *this;
     }
 
     // move constructor.
-    Set(Set &&rhs)
+    Map(Map &&rhs)
         : theSize{rhs.theSize},
           root{rhs.root}
     {
@@ -258,7 +302,7 @@ class Set
     }
 
     // move assignment
-    Set &operator=(Set &&rhs)
+    Map &operator=(Map &&rhs)
     {
         std::swap(theSize, rhs.theSize);
         std::swap(root, rhs.root);
@@ -300,12 +344,12 @@ class Set
     }
 
     // public member.
-    iterator insert(const Comparable &x)
+    iterator insert(const Pair<KeyType, ValueType> &x)
     {
         return insert(x, root, nullptr);
     }
 
-    iterator insert(iterator hint, const Comparable &x)
+    iterator insert(iterator hint, const Pair<KeyType, ValueType> &x)
     {
         BinaryNode *node = hint.current;
         // check legal.
@@ -320,7 +364,7 @@ class Set
             return insert(x);
     }
 
-    int erase(const Comparable &x)
+    int erase(const KeyType &x)
     {
         return remove(x, root) ? 1 : 0;
     }
@@ -352,7 +396,7 @@ class Set
     BinaryNode *root; // pointer to the root node of the BinarySearchTree
 
     // private insert method.
-    iterator insert(const Comparable &x,
+    iterator insert(const Pair<KeyType, ValueType> &x,
                     BinaryNode *&t,
                     BinaryNode *parent)
     {
@@ -421,9 +465,9 @@ class Set
      * Internal method to remove from a subtree.
      * x is the item to remove.
      * t is the node that roots the subtree.
-     * Set the new root of the subtree.
+     * Map the new root of the subtree.
      */
-    BinaryNode *remove(const Comparable &x, BinaryNode *&t)
+    BinaryNode *remove(const KeyType &x, BinaryNode *&t)
     {
         if (t == nullptr)
             return nullptr; // item not found; do nothing
@@ -458,27 +502,11 @@ class Set
 int main(int argc, char **argv)
 {
     int a[] = {5, 4, 3, 7, 9, 12, 6, 14, 1, 8};
-    Set<int> trees;
+    Map<int, int> maps;
     for (int i = 0; i < _countof(a); ++i)
-        trees.insert(a[i]);
+        maps.insert({a[i], i});
 
-    // test const_iterator
-    for (Set<int>::const_iterator iter = trees.begin(); iter != trees.end(); ++iter)
-        std::cout << *iter << " ";
-    std::cout << std::endl;
-
-    Set<int> tree1 = trees;
-    tree1.erase(5);
-    tree1.erase(1);
-    tree1.erase(14);
-    tree1.erase(8);
-    tree1.erase(0);
-    tree1.erase(1);
-    for (auto &x : tree1) // test range loop
-        std::cout << x << " ";
-    std::cout << std::endl;
-
-    tree1.erase(tree1.begin(), tree1.end());
-    std::cout << "size of tree is " << tree1.size() << std::endl;
+    for (auto iter = maps.begin(); iter != maps.end(); ++iter)
+        std::cout << iter->first << " " << iter->second << std::endl;
     return 0;
 }
