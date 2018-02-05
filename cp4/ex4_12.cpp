@@ -49,12 +49,14 @@ class Map
         BinaryNode *right;
         BinaryNode *parent;
 
-        BinaryNode(const Pair<KeyType, ValueType> &theElement, BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *pa = nullptr)
+        BinaryNode(const Pair<KeyType, ValueType> &theElement,
+            BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *pa = nullptr)
             : element{theElement}, left{lt}, right{rt}, parent{pa}
         {
         }
 
-        BinaryNode(KeyType &&theElement, BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *pa = nullptr)
+        BinaryNode(KeyType &&theElement, BinaryNode *lt = nullptr, 
+            BinaryNode *rt = nullptr, BinaryNode *pa = nullptr)
             : element{std::move(theElement)}, left{lt}, right{rt}, parent{pa}
         {
         }

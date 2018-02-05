@@ -20,12 +20,14 @@ class Set
         BinaryNode *right;
         BinaryNode *parent;
 
-        BinaryNode(const Comparable &theElement, BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *pa = nullptr)
+        BinaryNode(const Comparable &theElement, BinaryNode *lt = nullptr, 
+            BinaryNode *rt = nullptr, BinaryNode *pa = nullptr)
             : element{theElement}, left{lt}, right{rt}, parent{pa}
         {
         }
 
-        BinaryNode(Comparable &&theElement, BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *pa = nullptr)
+        BinaryNode(Comparable &&theElement, BinaryNode *lt = nullptr,
+            BinaryNode *rt = nullptr, BinaryNode *pa = nullptr)
             : element{std::move(theElement)}, left{lt}, right{rt}, parent{pa}
         {
         }

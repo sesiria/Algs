@@ -22,12 +22,14 @@ class Set
         BinaryNode *prev;
         BinaryNode *next;
 
-        BinaryNode(const Comparable &theElement, BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *p = nullptr, BinaryNode *n = nullptr)
+        BinaryNode(const Comparable &theElement, BinaryNode *lt = nullptr, 
+            BinaryNode *rt = nullptr, BinaryNode *p = nullptr, BinaryNode *n = nullptr)
             : element{theElement}, left{lt}, right{rt}, prev{p}, next{n}
         {
         }
 
-        BinaryNode(Comparable &&theElement, BinaryNode *lt = nullptr, BinaryNode *rt = nullptr, BinaryNode *p = nullptr, BinaryNode *n = nullptr)
+        BinaryNode(Comparable &&theElement, BinaryNode *lt = nullptr, 
+            BinaryNode *rt = nullptr, BinaryNode *p = nullptr, BinaryNode *n = nullptr)
             : element{std::move(theElement)}, left{lt}, right{rt}, prev{p}, next{n}
         {
         }
