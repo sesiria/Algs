@@ -1,3 +1,8 @@
+/**
+ * Author: sesiria  2018
+ * SplayTree bottom-top access/rotation implementation.
+ * Add parent node for rotations.
+ */
 #ifndef SPLAYTREE_H
 #define SPLAYTREE_H
 
