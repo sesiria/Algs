@@ -52,8 +52,9 @@ int countLeaves(BinaryNode<Comparable> *node)
 {
     if (node == nullptr)
         return 0;
-    int leafCount = (node->left == nullptr &&node->right == nullptr) ? 1 : 0;
-    return leafCount + countLeaves(node->left) + countLeaves(node->right);
+    if (node->left == nullptr &&node->right == nullptr)
+        return 1;
+    return countLeaves(node->left) + countLeaves(node->right);
 }
 
 /**
