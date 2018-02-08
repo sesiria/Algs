@@ -1,15 +1,13 @@
 /*
- * Exercise 4.34
+ * Exercise 4.38
  * Author: sesiria  2018
- * generate random binary search tree
- * time complexity O(NlogN)
+ * calculate the coordinate of XY for the node of binary search tree.
  */
 
 #include "../Lib/randomize.h"
 #include <algorithm>
 #include <iostream>
 #include <ostream>
-#include <time.h>
 #include <vector>
 
 template <typename Comparable>
@@ -18,14 +16,16 @@ struct BinaryNode
     Comparable element;
     BinaryNode *left;
     BinaryNode *right;
+    int x_pos;
+    int y_pos;
 
-    BinaryNode(const Comparable &theElement, BinaryNode *lt, BinaryNode *rt)
-        : element{theElement}, left{lt}, right{rt}
+    BinaryNode(const Comparable &theElement, BinaryNode *lt, BinaryNode *rt, int x = 0, int y = 0)
+        : element{theElement}, left{lt}, right{rt}, x_pos{x}, y_pos{y}
     {
     }
 
-    BinaryNode(Comparable &&theElement, BinaryNode *lt, BinaryNode *rt)
-        : element{std::move(theElement)}, left{lt}, right{rt}
+    BinaryNode(Comparable &&theElement, BinaryNode *lt, BinaryNode *rt, int x = 0, int y = 0)
+        : element{std::move(theElement)}, left{lt}, right{rt}, x_pos{x}, y_pos{y}
     {
     }
 };
@@ -37,6 +37,7 @@ void printTree(BinaryNode<Comparable> *node)
         return;
     printTree(node->left);
     std::cout << node->element << " ";
+    printf("with coordinate (%d, %d).\n", node->x_pos, node->y_pos);
     printTree(node->right);
 }
 
@@ -122,43 +123,60 @@ BinaryNode<int> *genRandomTree(int lower, int upper)
 }
 
 /**
- * generateRandomBST base on recursive bound.
- * time complexity O(N)
- */
+ * update all node's x coordinate.
+ * time complexity O(N).
+ */ 
 template <typename Comparable>
-void generateRandomBST2(BinaryNode<Comparable> *&t, int nSize)
+void calculateCoordinateX(BinaryNode<Comparable> *t, int & lastposX, int distance)
 {
-    t = genRandomTree(0, nSize);
+    if(t == nullptr)
+        return;
+    calculateCoordinateX(t->left, lastposX, distance);
+    t->x_pos = lastposX;
+    lastposX += distance;
+    calculateCoordinateX(t->right, lastposX, distance);
 }
 
-typedef void (*func)(BinaryNode<int> *&t, int);
-void testGenerate(func fun, BinaryNode<int> *&t, int nSize)
+/**
+ * update all node's x coordinate.
+ */ 
+template <typename Comparable>
+void calculateCoordinateX(BinaryNode<Comparable> *t, int distance = 10)
 {
-    clock_t start = clock();
-    fun(t, nSize);
-    clock_t end = clock();
-    printf("Time cost is %f.\n", (end - start) / (float)(CLOCKS_PER_SEC));
-    makeEmpty(t);
+    int initPosX = distance;
+    calculateCoordinateX(t, initPosX, distance);
+}
+
+
+/**
+ * update all node's y coordinate.
+ */ 
+template <typename Comparable>
+void calculateCoordinateY(BinaryNode<Comparable> *t, int initposY, int depth, int distance)
+{
+    if(t == nullptr)
+        return;
+    calculateCoordinateY(t->left, initposY, depth + 1, distance);
+    t->y_pos = initposY + depth * distance;
+    calculateCoordinateY(t->right, initposY, depth + 1, distance);
+}
+
+/**
+ * update all node's x coordinate.
+ */ 
+template <typename Comparable>
+void calculateCoordinateY(BinaryNode<Comparable> *t, int distance = 15)
+{
+    int initposY = distance;
+    calculateCoordinateY(t, initposY, 0, distance);
 }
 
 int main(int argc, char **argv)
 {
     BinaryNode<int> *root = nullptr;
-    generateRandomBST(root, 10);
+    generateRandomBST(root, 20);
+    calculateCoordinateX(root);
+    calculateCoordinateY(root);
     printTree(root);
-    std::cout << std::endl;
-
-    BinaryNode<int> *root2 = nullptr;
-    generateRandomBST(root2, 10);
-    printTree(root2);
-    std::cout << std::endl;
-
-    BinaryNode<int> *root3 = nullptr;
-    generateRandomBST2(root3, 10);
-    printTree(root2);
-    std::cout << std::endl;
-
-    testGenerate(generateRandomBST, root, 200000);
-    testGenerate(generateRandomBST2, root, 200000);
     return 0;
 }

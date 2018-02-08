@@ -1,5 +1,5 @@
 /*
- * Exercise 4.34
+ * Exercise 4.37
  * Author: sesiria  2018
  * generate random binary search tree
  * time complexity O(NlogN)
@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <iostream>
 #include <ostream>
-#include <time.h>
 #include <vector>
 
 template <typename Comparable>
@@ -102,63 +101,43 @@ void generateRandomBST(BinaryNode<Comparable> *&t, int nSize)
 }
 
 /**
- * generateRandomTree base on recursive bound.
- * dive-and-conquer
- * time complexity O(NlogN)
- */
-BinaryNode<int> *genRandomTree(int lower, int upper)
+ * print all of the key within the range key1 < x < key2.
+ * assume key1 <= key2.
+ * time complexity O(k + logN) k is the number of key printed.
+ */ 
+template<typename Comparable>
+void printKeys(BinaryNode<Comparable> *t, const Comparable & key1, const Comparable & key2)
 {
-    BinaryNode<int> *t = nullptr;
-    int randomValue;
-
-    if (lower <= upper)
-    {
-        t = new BinaryNode<int>{(randomValue = randInt(lower, upper)),
-                                genRandomTree(lower, randomValue - 1),
-                                genRandomTree(randomValue + 1, upper)};
-    }
-
-    return t;
+    if(t == nullptr)
+        return;
+    if(key1 < t->element)
+        printKeys(t->left, key1,  key2);
+    if(key1 <= t->element && t->element <= key2)
+        std::cout << t->element << " ";
+    if(t->element < key2)
+        printKeys(t->right, key1, key2);
 }
 
-/**
- * generateRandomBST base on recursive bound.
- * time complexity O(N)
- */
-template <typename Comparable>
-void generateRandomBST2(BinaryNode<Comparable> *&t, int nSize)
-{
-    t = genRandomTree(0, nSize);
-}
-
-typedef void (*func)(BinaryNode<int> *&t, int);
-void testGenerate(func fun, BinaryNode<int> *&t, int nSize)
-{
-    clock_t start = clock();
-    fun(t, nSize);
-    clock_t end = clock();
-    printf("Time cost is %f.\n", (end - start) / (float)(CLOCKS_PER_SEC));
-    makeEmpty(t);
-}
 
 int main(int argc, char **argv)
 {
     BinaryNode<int> *root = nullptr;
-    generateRandomBST(root, 10);
-    printTree(root);
+    generateRandomBST(root, 100);
+    printKeys(root, 25, 37);
     std::cout << std::endl;
 
-    BinaryNode<int> *root2 = nullptr;
-    generateRandomBST(root2, 10);
-    printTree(root2);
+    BinaryNode<int> *root1 = nullptr;
+    int a[] = {5, 4, 3, 7, 9, 12, 6, 1, 14, 8};
+    for (int i = 0; i < _countof(a); ++i)
+        insert(a[i],root1);
+
+    printKeys(root1, 5, 37);
     std::cout << std::endl;
 
-    BinaryNode<int> *root3 = nullptr;
-    generateRandomBST2(root3, 10);
-    printTree(root2);
+    printKeys(root1, -10, 37);
     std::cout << std::endl;
 
-    testGenerate(generateRandomBST, root, 200000);
-    testGenerate(generateRandomBST2, root, 200000);
+    printKeys(root1, -1, 5);
+    std::cout << std::endl;
     return 0;
 }
