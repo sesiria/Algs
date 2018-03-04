@@ -86,6 +86,11 @@ class BTree
         remove(root, k);
     }
 
+    bool search(const Comparable &k)
+    {
+        return search(root, k).first != nullptr;
+    }
+
     void printTree()
     {
         printTree(root);
@@ -157,13 +162,13 @@ class BTree
                 if (t->children[i]->numOfKeys >= minDegree) // case 2-a
                 {
                     TreeNode *nodeChild = t->children[i];
-                    t->Keys[i] = nodeChild->Keys[nodeChild->numOfKeys - 1];
+                    t->Keys[i] = findMaxKey(nodeChild); //nodeChild->Keys[nodeChild->numOfKeys - 1];
                     remove(nodeChild, t->Keys[i]);
                 }
                 else if (t->children[i + 1]->numOfKeys >= minDegree) // case 2-b
                 {
                     TreeNode *nodeChild = t->children[i + 1];
-                    t->Keys[i] = nodeChild->Keys[0];
+                    t->Keys[i] = findMinKey(nodeChild); //nodeChild->Keys[0];
                     remove(nodeChild, t->Keys[i]);
                 }
                 else // case 2-c
@@ -208,7 +213,7 @@ class BTree
     std::pair<TreeNode *, int> search(TreeNode *t, const Comparable &k)
     {
         if (t == nullptr)
-            return nullptr;
+            return {nullptr, -1};
 
         int i = 0;
         while (i < t->numOfKeys && t->Keys[i] < k)
@@ -217,9 +222,9 @@ class BTree
         if (i < t->numOfKeys && k == t->Keys[i])
             return {t, i};  // the current node contain the k.
         else if (t->isLeaf) // search to the end.
-            return nullptr;
+            return {nullptr, -1};
         else
-            return search(t->childrens[i], k); // the i is always less than the size of the childrens vector.
+            return search(t->children[i], k); // the i is always less than the size of the childrens vector.
     }
 
     void createTree()
@@ -351,19 +356,42 @@ class BTree
                 std::swap(nodeSibling->children[i - 1], nodeSibling->children[i]);
         --nodeSibling->numOfKeys;
     }
+
+    Comparable findMaxKey(TreeNode *t)
+    {
+        if(t->isLeaf)
+            return t->Keys[t->numOfKeys - 1];
+        else
+            return findMaxKey(t->children[t->numOfKeys]);
+    }
+
+    Comparable findMinKey(TreeNode *t)
+    {
+        if(t->isLeaf)
+            return t->Keys[0];
+        else
+            return findMaxKey(t->children[0]);
+    }
 };
 
 int main(int argc, char **argv)
 {
-    BTree<int> btree{3};
+    BTree<int> btree{5};
     for (int i = 100; i >= 1; --i)
         btree.insert(i);
 
     btree.printTree();
 
-    for (int i = 1; i * 2 <= 100; ++i)
+   for (int i = 1; i * 2 <= 100; ++i)
         btree.remove(i * 2);
 
+    btree.printTree();
+
+    for (int i = 1; i  < 100; ++i)
+    {
+        btree.remove(i);
+    }
+        
     btree.printTree();
 
     return 0;
