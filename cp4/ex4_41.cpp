@@ -6,6 +6,7 @@
  * 2) deletion routine
  * 3) ektended insertion routine
  * time complekity O(N)
+ * Refer Introduction to Algorithm 3rd Chapter 18 B-Trees.
  */
 
 #include <algorithm>
