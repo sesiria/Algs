@@ -4,7 +4,7 @@
  * A implementation for B-tree(B+tree) including:
  * 1) insertion routine(createTree / search)
  * 2) deletion routine
- * 3) ektended insertion routine
+ * 3) extended insertion routine
  * time complekity O(N)
  * Refer Introduction to Algorithm 3rd Chapter 18 B-Trees.
  */

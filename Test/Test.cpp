@@ -1,39 +1,32 @@
-#include "../Lib/randomize.h"
 #include <iostream>
 #include <map>
 
-int rand01()
-{
-    return RNG::getInstance().getInteger() % 2;
-}
+class B{
+  public:
+    virtual void f(){
+        std::cout << "B" << std::endl;
+    }
+};
 
-#define N (10)
+class B1 : virtual public B {
+  public:
+    virtual void f(){}
+};
 
-int random(int num)
-{
-    int result = 0;
-    int upperbound = 1;
-    while (upperbound < (num + 1))
-            upperbound *= 2;
-    do
-    {
-        result = 0;
-        int nBound = upperbound;
-        while ((nBound /= 2) > 0)
-            result += nBound * rand01();
-    } while (result > num);
-    return result;
-}
+class B2 : virtual public B {
+  public:
+    virtual void f(){}
+};
 
+class B3 :  public B1,  public B2 {
+  public:
+    virtual void f(){}
+};
 int main(int argc, char **argv)
 {
-    printf("Randomly test 1,000,000 of rand01 result:\n");
-
-    long long  resultN[N + 1] = {0};
-    for (long long i = 0; i < 1000000; ++i)
-        ++resultN[random(N)];
-
-    for (int i = 0; i <= N; ++i)
-        printf("%d is : %ld\n", i, resultN[i]);
+    B *pB = new B3();
+    B1 *pB1 = dynamic_cast<B1*>(pB);
+    B2 *pB2 = dynamic_cast<B2*>(pB1);
+    B3 *pB3 = dynamic_cast<B3*>(pB2);
     return 0;
 }
