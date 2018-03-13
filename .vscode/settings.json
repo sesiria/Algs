@@ -52,6 +52,10 @@
         "ratio": "cpp",
         "sstream": "cpp",
         "string": "cpp",
-        "qapplication": "cpp"
+        "qapplication": "cpp",
+        "atomic": "cpp",
+        "cstddef": "cpp",
+        "stack": "cpp",
+        "fstream": "cpp"
     } // 效果稍好，但太卡，故关掉  
 }
