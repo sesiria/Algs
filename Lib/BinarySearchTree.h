@@ -79,7 +79,10 @@ class BinarySearchTree
         insert(x, root);
     }
 
-    void insert(Comparable &&x);
+    void insert(Comparable &&x)
+    {
+        insert(std::move(x), root);
+    }
 
     // remove x from the tree. Nothing is done if x is not found.
     void remove(const Comparable &x)
@@ -97,6 +100,7 @@ class BinarySearchTree
     BinarySearchTree &operator=(BinarySearchTree &&rhs)
     {
         std::swap(root, rhs.root);
+        return *this;
     }
 
   private:

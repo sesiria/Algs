@@ -160,7 +160,6 @@ void parseEntry(const std::string &entry)
 
     int pos = posStart + 1;
     bool bExpanded = false;
-    bool isStart = false;
     std::vector<std::string> vec;
     int titleStart, titleEnd;
     for (titleStart = titleEnd = pos; pos < posEnd; ++pos)
@@ -175,18 +174,10 @@ void parseEntry(const std::string &entry)
         {
             bExpanded = true;
         }
-        else if (entry[pos] == '(')
+        else if (entry[pos] == '(' || entry[pos] == ')')
         {
             if (!bExpanded) // illegal entry.
                 return;
-
-            isStart = true;
-        }
-        else if (entry[pos] == ')')
-        {
-            if (!bExpanded) // illegal entry.
-                return;
-            isStart = false;
         }
         else
         {
