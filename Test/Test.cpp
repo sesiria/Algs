@@ -1,12 +1,15 @@
 #include <iostream>
-#include <map>
-#include <string>
+#include <cstring>
 #include <vector>
-
+#include <map>
+#include <algorithm>
+using namespace std;
 
 int main(int argc, char **argv)
 {
-    //permuatation("Hello");
-    //allFib(5)
+    map<string,string> mp =parseHeader(str);
+    for(map<string,string>::const_iterator it=mp.begin();it!=mp.end();++it){
+        cout<<it->first <<"   "<<it->second<<endl;
+    }
     return 0;
 }
