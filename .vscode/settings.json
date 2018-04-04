@@ -56,6 +56,7 @@
         "atomic": "cpp",
         "cstddef": "cpp",
         "stack": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "cstring": "cpp"
     } // 效果稍好，但太卡，故关掉  
 }
