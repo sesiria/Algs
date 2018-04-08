@@ -7,7 +7,6 @@
 #define HASH_TABLE_PROBING_H
 
 #include <algorithm>
-#include <math.h>
 #include <string>
 #include <vector>
 #include <iostream>
