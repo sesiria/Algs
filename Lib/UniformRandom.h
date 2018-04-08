@@ -127,7 +127,8 @@ class Random48
 // int nextInt( int low, int high )        --> Uniform [low..high)
 
 
-static int currentTimeSeconds( )
+inline int 
+currentTimeSeconds( )
 {
     auto now = chrono::high_resolution_clock::now( ).time_since_epoch( );       
     return chrono::duration_cast<chrono::seconds>( now ).count( );
