@@ -1,3 +1,11 @@
+/*
+* Author: sesiria  2018
+* hashtable implementation by hopscotch hash algorithm.
+* hash function implementation by universal hash algorithm.
+* this implementation will support by multi-thread implementation.
+* Note: normal or simple hash function will cause the performance very pool.
+* so we choose the universal hash function.
+*/
 #ifndef HOPSCOTCH_HASHTABLE_H
 #define HOPSCOTCH_HASHTABLE_H
 
@@ -39,7 +47,7 @@ int nextPrime(int n)
 }
 
 
-size_t universalHash1(int x, int A, int B, int M)
+size_t universalHash(int x, int A, int B, int M)
 {
     static const int DIGS = 31;
     static const int mersennep = static_cast<int>((1L << DIGS) - 1);
@@ -227,7 +235,7 @@ private:
 	size_t myhash(const HashedObj &x) const
 	{
 		static hash<HashedObj> hf; 
-        return  universalHash1(hf(x), 31, 7932, array.size());
+        return  universalHash(hf(x), 31, 7932, array.size());
 	}
 
 	bool insertHelper1(const HashedObj &xx)

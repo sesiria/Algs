@@ -18,10 +18,12 @@ template <typename HashedObj>
 class hash
 {
   public:
-    size_t operator()(const HashedObj &key)
+    size_t operator()(const HashedObj &key) const
     {
         return static_cast<size_t>(key);
     }
+
+    bool operator()(const HashedObj &lhs, const HashedObj &rhs) const;
 };
 
 /**
@@ -31,7 +33,7 @@ template <>
 class hash<std::string>
 {
   public:
-    size_t operator()(const std::string &key)
+    size_t operator()(const std::string &key) const
     {
         size_t hashVal = 0;
 
@@ -39,6 +41,11 @@ class hash<std::string>
             hashVal = 37 * hashVal + ch;
 
         return hashVal;
+    }
+
+    bool operator()(const std::string & lhs, const std::string & rhs) const
+    {
+        return lhs < rhs;
     }
 };
 
