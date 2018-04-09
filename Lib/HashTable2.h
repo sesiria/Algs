@@ -157,6 +157,11 @@ class HashTable
         std::cout << std::endl;
     }
 
+    int capacity()
+    {
+        return array.size();
+    }
+
   private:
     struct HashEntry
     {

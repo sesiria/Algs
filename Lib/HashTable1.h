@@ -156,6 +156,14 @@ class HashTable
         std::cout << std::endl;
     }
 
+    int capacity()
+    {
+        int result = 0;
+        for(auto &entry : theLists)
+            result += entry.size();
+        return result;
+    }
+
   private:
     std::vector<std::list<HashedObj>> theLists;
     int currentSize;
@@ -189,7 +197,7 @@ class HashTable
 // this is the sample code for the HashTable.
 
 // Example of an Employee class
-class Employee
+/*class Employee
 {
   public:
     const std::string &getName() const
@@ -224,6 +232,6 @@ class hash<Employee>
         static hash<std::string> hf;
         return hf(item.getName());
     }
-};
+};*/
 
 #endif

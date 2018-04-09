@@ -1,6 +1,6 @@
 #include <iostream>
 #include <sstream>
-#include "../Lib/CuckooHashTable.h"
+#include "../Lib/HashTable2.h"
 using namespace std;
 
 
@@ -18,7 +18,7 @@ string toString( Object x )
 int main( )
 {
     const int NUMS = 2000000;
-    const int GAP  =   37;
+    const int GAP  =  37;
     const int ATTEMPTS = 1;
     int i;
 
@@ -28,8 +28,8 @@ int main( )
     { 
         cout << "ATTEMPT: " << att << endl;
         
-        CuckooHashTable<string,StringHashFamily<3>> h1;
-        CuckooHashTable<string,StringHashFamily<3>> h2;
+        HashTable<string> h1;
+        HashTable<string> h2;
         
         for( i = GAP; i != 0; i = ( i + GAP ) % NUMS )
         {
