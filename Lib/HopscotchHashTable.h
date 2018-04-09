@@ -38,6 +38,21 @@ int nextPrime(int n)
 	return n;
 }
 
+
+size_t universalHash1(int x, int A, int B, int M)
+{
+    static const int DIGS = 31;
+    static const int mersennep = static_cast<int>((1L << DIGS) - 1);
+
+    long long hashVal = static_cast<long long>(A) * x + B;
+
+    hashVal = ((hashVal >> DIGS) + (hashVal & mersennep));
+    if(hashVal >= mersennep)
+        hashVal -= mersennep;
+
+    return static_cast<size_t>(hashVal) % M;
+}
+
 /**
 * generic hash function object. for int, float, double
 */
@@ -46,7 +61,6 @@ class hash
 {
 public:
 	size_t operator()(const HashedObj &key);
-	void generateNewHash();
 };
 
 /**
@@ -64,11 +78,6 @@ public:
 			hashVal = 37 * hashVal + ch;
 
 		return hashVal;
-	}
-
-	void generateNewHash()
-	{
-
 	}
 };
 
@@ -217,8 +226,8 @@ private:
 
 	size_t myhash(const HashedObj &x) const
 	{
-		static hash<HashedObj> hf;
-		return hf(x) % array.size();
+		static hash<HashedObj> hf; 
+        return  universalHash1(hf(x), 31, 7932, array.size());
 	}
 
 	bool insertHelper1(const HashedObj &xx)
