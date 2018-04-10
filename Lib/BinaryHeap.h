@@ -9,7 +9,7 @@ template <typename Comparable>
 class BinaryHeap{
   public:
     explicit BinaryHeap(int capacity = 100)
-     : array(capacity < 100 ? 100 : capacity) , currentSize{0}
+     : currentSize{0}, array(capacity < 100 ? 100 : capacity)
     {
 
     }
@@ -123,7 +123,7 @@ class BinaryHeap{
     void percolateDown(int hole)
     {
         int child;
-        Comparable tmp = std::move[array[hole]];
+        Comparable tmp = std::move(array[hole]);
 
         while (hole * 2 <= currentSize)
         {
