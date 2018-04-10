@@ -8,14 +8,33 @@
 template <typename Comparable>
 class BinaryHeap{
   public:
-    explicit BinaryHeap(int capacity = 100);
-    explicit BinaryHeap(const std::vector<Comparable> &items);
+    explicit BinaryHeap(int capacity = 100)
+     : array(capacity < 100 ? 100 : capacity) , currentSize{0}
+    {
+
+    }
+
+    explicit BinaryHeap(const std::vector<Comparable> &items)
+     : array{items.size() + 10}, currentSize{items.size()}
+    {
+        for (int i = 0; i < items.size(); ++i)
+            array[i + 1] = items[i];
+        buildHeap();
+    }
 
     bool isEmpty() const
     {
         return currentSize == 0;
     }
-    const Comparable &findMin() const;
+
+    const Comparable &findMin() const
+    {
+        if(isEmpty())
+            std::__throw_underflow_error(
+                "Try to delete element from an empty heap");
+
+        return array[1];
+    }
 
     /**
      * Insert item x, allowing duplicates.
@@ -86,7 +105,16 @@ class BinaryHeap{
     int currentSize;                    // Number of elements in heap
     std::vector<Comparable> array;      // The heap array
 
-    void buildHeap();
+
+    /**
+     * Establish heap order property from an arbitrary
+     * arrangement of items. Runs in linear time.
+     */ 
+    void buildHeap()
+    {
+        for (int i = currentSize / 2; i > 0; --i)
+            percolateDown(i);
+    }
 
     /**
      * Internal method to percolate down in the heap.
