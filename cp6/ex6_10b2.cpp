@@ -1,7 +1,10 @@
-#ifndef BINOMIAL_QUEUE_H
-#define BINOMIAL_QUEUE_H
-
+/*
+* Exercise 6.10b2
+* Author: sesiria  2018
+* print all element less than k from an binomial heap
+*/
 #include <algorithm>
+#include <iostream>
 #include <vector>
 
 template <typename Comparable>
@@ -141,7 +144,7 @@ class BinomialQueue
     void makeEmpty()
     {
         currentSize = 0;
-        for(auto & root : theTrees)
+        for (auto &root : theTrees)
             makeEmpty(root);
     }
 
@@ -276,7 +279,7 @@ class BinomialQueue
      */
     void makeEmpty(BinomialNode *&t)
     {
-        if(t != nullptr)
+        if (t != nullptr)
         {
             makeEmpty(t->leftChild);
             makeEmpty(t->nextSibling);
@@ -290,11 +293,51 @@ class BinomialQueue
      */
     BinomialNode *clone(BinomialNode *t) const
     {
-        if(t == nullptr)
+        if (t == nullptr)
             return nullptr;
         else
             return new BinomialNode{t->element, clone(t->leftChild), clone(t->nextSibling)};
     }
+
+  private:
+    void printElements1(BinomialNode *t, const Comparable &x);
+
+  public:
+    void printElements(const Comparable &x);
 };
 
-#endif
+/**
+ * Print all of the elements less then X from a binary heap.
+ * time complexity O(K)
+ */
+template <typename Comparable>
+void BinomialQueue<Comparable>::printElements(const Comparable &x)
+{
+    if (isEmpty())
+        return;
+    for (auto &entry : theTrees)
+        if (entry)
+            printElements1(entry, x);
+}
+
+template <typename Comparable>
+void BinomialQueue<Comparable>::printElements1(BinomialNode *t, const Comparable &x)
+{
+    if (t == nullptr)
+        return;
+    if (t->element < x)
+    {
+        std::cout << t->element << " ";
+        printElements1(t->leftChild, x);
+    }
+    printElements1(t->nextSibling, x);
+}
+
+int main()
+{
+    BinomialQueue<int> heap;
+    for (int i = 0; i < 1000; ++i)
+        heap.insert(i);
+    heap.printElements(30);
+    return 0;
+}
