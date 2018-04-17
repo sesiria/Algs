@@ -139,7 +139,13 @@ public:
 			--currentSize;
 	}
 
-	void makeEmpty();
+    /**
+     * clear the current heap
+     */ 
+	void makeEmpty()
+    {
+        currentSize = 0;
+    }
 
 private:
 	int currentSize;               // Number of elements in heap
