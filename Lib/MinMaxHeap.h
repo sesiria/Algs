@@ -59,8 +59,6 @@ public:
 			return array[2] > array[3] ? array[2] : array[3];
 	}
 
-
-
 	/**
 	* Insert item x, allowing duplicates.
 	* time complexity O(logN)
@@ -123,6 +121,10 @@ public:
 		deleteMax(tmp);
 	}
 
+	/**
+	* Remove the max item and place it in maxItem.
+	* Throw UnderflowException if empty.
+	*/
 	void deleteMax(Comparable &maxItem)
 	{
 		if (isEmpty())
@@ -370,6 +372,12 @@ private:
 		}
 	}
 
+    /**
+     * level-order for the heap to build the order-property
+     * for each level the time complexity is O(logN) * M
+     * M = 2^L which is the nodes of the current level
+     * L is the level id number.
+     */ 
 	void traverseLevel(int level)
 	{
 		bool isEven = (level % 2 == 0);
