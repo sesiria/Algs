@@ -59,6 +59,7 @@
         "fstream": "cpp",
         "cstring": "cpp",
         "unordered_set": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "hash_set": "cpp"
     } // 效果稍好，但太卡，故关掉  
 }

@@ -26,9 +26,9 @@ public:
 	}
 
 	explicit MinMaxHeap(const std::vector<Comparable> &items)
-		: array{items.size() + 10}, currentSize{ items.size() }
+		: currentSize( items.size() ), array(items.size() + 10)
 	{
-		for (int i = 0; i < items.size(); ++i)
+		for (size_t i = 0; i < items.size(); ++i)
 			array[i + 1] = items[i];
 		buildHeap();
 	}
@@ -151,8 +151,19 @@ private:
 	*/
 	void buildHeap()
 	{
-		for (int i = currentSize / 2; i > 0; --i)
-			percolateDown(i);
+		// level order traversal
+		if (getDepth(currentSize) % 2 == 0) {
+			for (int l = 0; l <= getDepth(currentSize); l += 2)
+				traverseLevel(l);
+			for (int l = getDepth(currentSize) - 1; l > 0; l -= 2)
+				traverseLevel(l);
+		}
+		else {
+			for (int l = 0; l < getDepth(currentSize); l += 2)
+				traverseLevel(l);
+			for (int l = getDepth(currentSize); l > 0; l -= 2)
+				traverseLevel(l);
+		}
 	}
 
 	/**
@@ -255,32 +266,6 @@ private:
 		return hole;
 	}
 
-	/**
-	* Internal method to percolate down in the heap.
-	* hole is the index at which the percolate begins.
-	*/
-	void percolateDown(int hole)
-	{
-		int child;
-		Comparable tmp = std::move(array[hole]);
-
-		while (hole * 2 <= currentSize)
-		{
-			child = hole * 2;
-			// whether the current node have the left child.
-			if (child != currentSize && array[child + 1] < array[child])
-				++child;
-
-			if (array[child] < tmp)
-				array[hole] = std::move(array[child]);
-			else
-				break;
-
-			hole = child;
-		}
-		array[hole] = std::move(tmp);
-	}
-
 	int getDepth(int pos)
 	{
 		int nDepth = 0;
@@ -290,6 +275,18 @@ private:
 			nDepth++;
 		}
 		return nDepth;
+	}
+
+	int power(int x, int n)
+	{
+		if (n == 0)
+			return 1;
+		if (n == 1)
+			return x;
+		if (n % 2 == 0)
+			return power(x * x, n / 2);
+		else
+			return x * power(x * x, n / 2);
 	}
 
 	int findMaxPosition() const
@@ -327,7 +324,7 @@ private:
 				percolateUpOdd(child);
 			}
 		} // if it is not a complete tree.
-		else if (hole >= 2 && array[hole] > array[hole / 2]) { 
+		if (hole >= 2 && array[hole] > array[hole / 2]) { 
 			std::swap(array[hole], array[hole / 2]); // move to parent with odd-level
 			hole /= 2;
 			percolateUpOdd(hole);
@@ -358,13 +355,25 @@ private:
 				}
 			}
 		} // if it is not a complete tree.
-		else if (hole >= 2 && array[hole] < array[hole / 2])
+		if (currentSize > 3 && hole >= 2 && array[hole] < array[hole / 2])
 		{
 			std::swap(array[hole], array[hole / 2]);
 			hole /= 2;
 			percolateUpEven(hole);
 			return;
 		}
+	}
+
+	void traverseLevel(int level)
+	{
+		bool isEven = (level % 2 == 0);
+		for (int start = power(2, level), end = 2 * start;
+			start != end && start <= currentSize; ++start) {
+			if (isEven)
+				percolateEven(start);
+			else
+				percolateOdd(start);
+		}		
 	}
 };
 
