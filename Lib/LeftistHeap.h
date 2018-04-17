@@ -2,6 +2,8 @@
 #define LEFTIST_HEAP_H
 
 #include <algorithm>
+#include <queue>
+#include <vector>
 
 template <typename Comparable>
 class LeftistHeap
@@ -10,6 +12,12 @@ class LeftistHeap
     LeftistHeap()
         : root{nullptr}
     {
+    }
+
+    explicit LeftistHeap(const std::vector<Comparable> & vec)
+        : root(nullptr)
+    {
+
     }
 
     LeftistHeap(const LeftistHeap &rhs)
@@ -144,6 +152,30 @@ class LeftistHeap
     };
 
     LeftistNode *root;
+
+    /**
+     * build heap routine.
+     * time complexity O(N)
+     */ 
+    void buildHeap(const std::vector<Comparable> &vec)
+    {
+        std::queue<LeftistNode *> queue;
+        for(auto & x : vec)
+            queue.push(new LeftistNode(x));
+        
+        while(queue.size() > 1) {
+            LeftistNode *node1 = queue.front();
+            queue.pop();
+            LeftistNode *node2 = queue.front();
+            queue.pop();
+            queue.push(merge(node1, node2));
+        }
+
+        if(!queue.isEmpty()) {
+            root = queue.front();
+            queue.pop();
+        }
+    }
 
     /**
      * Internal method to merge two roots.
