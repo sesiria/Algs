@@ -381,8 +381,8 @@ void error(int id)
 	else if (id == 4)
 	{
 		printf("ERROR : Invalid Number of Arguments!!!\n");
-		printf("Command Usage:  UCR_DTW.exe  data-file  query-file   m   R\n\n");
-		printf("For example  :  UCR_DTW.exe  data.txt   query.txt   128  0.05\n");
+		printf("Command Usage:  UCR_DTW.exe  data-file  query-file   m   R      candidates\n\n");
+		printf("For example  :  UCR_DTW.exe  data.txt   query.txt   128  0.05       100\n");
 	}
 	exit(1);
 }

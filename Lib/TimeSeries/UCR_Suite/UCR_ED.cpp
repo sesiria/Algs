@@ -1,7 +1,7 @@
 /***********************************************************************/
 /************************* DISCLAIMER **********************************/
 /***********************************************************************/
-/** This UCR Suite software is copyright protected © 2012 by          **/
+/** This UCR Suite software is copyright protected ï¿½ 2012 by          **/
 /** Thanawin Rakthanmanon, Bilson Campana, Abdullah Mueen,            **/
 /** Gustavo Batista and Eamonn Keogh.                                 **/
 /**                                                                   **/
@@ -20,7 +20,10 @@
 /** not use this software.                                            **/
 /***********************************************************************/
 /***********************************************************************/
-
+/**
+ * top-k selection modified by sesiria 2019
+ * Implement by STL priority_queue
+ */ 
 
 #include <stdio.h>
 #include <stdlib.h>
