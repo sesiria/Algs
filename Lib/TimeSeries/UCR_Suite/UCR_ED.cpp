@@ -20,10 +20,6 @@
 /** not use this software.                                            **/
 /***********************************************************************/
 /***********************************************************************/
-/**
- * top-k selection modified by sesiria 2019
- * Implement by STL priority_queue
- */ 
 
 #include <stdio.h>
 #include <stdlib.h>
