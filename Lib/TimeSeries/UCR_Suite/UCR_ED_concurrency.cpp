@@ -4,8 +4,10 @@
 #include <atomic>
 #include <vector>
 #include <queue>
-#include <algorithm>    // for std::sort algorithm
+#include <algorithm>    // for sort algorithm
 #include <chrono>       // get exactly time stamp
+
+using namespace std;
 
 /// global variable definition.
 constexpr double INF = 10e20;
@@ -29,9 +31,9 @@ struct comp {
 /// Q is the query series
 /// T is the target series searched
 /// order is the sorted index of the query series.
-double distance(const std::vector<double>& Q, 
-                const std::vector<double>& T, 
-                const std::vector<int> & order,
+double distance(const vector<double>& Q, 
+                const vector<double>& T, 
+                const vector<int> & order,
                 const int& j, 
                 const int& m, 
                 const double& mean, 
@@ -52,16 +54,16 @@ double distance(const std::vector<double>& Q,
 void error(int id)
 {
     if(id==1)
-        std::cout <<"ERROR : Memory can't be allocated!!!\n\n";
+        cout <<"ERROR : Memory can't be allocated!!!\n\n";
     else if ( id == 2 )
-        std::cout <<"ERROR : File not Found!!!\n\n";
+        cout <<"ERROR : File not Found!!!\n\n";
     else if ( id == 3 )
-        std::cout <<"ERROR : Can't create Output File!!!\n\n";
+        cout <<"ERROR : Can't create Output File!!!\n\n";
     else if ( id == 4 )
     {
-        std::cout << "ERROR: Invalid Number of Arguments!!!\n";
-        std::cout << "Command Usage:   UCR_ED.exe  data_file  query_file   m   \n";
-        std::cout << "For example  :   UCR_ED.exe  data.txt   query.txt   128  \n";
+        cout << "ERROR: Invalid Number of Arguments!!!\n";
+        cout << "Command Usage:   UCR_ED.exe  data_file  query_file   m   \n";
+        cout << "For example  :   UCR_ED.exe  data.txt   query.txt   128  \n";
     }
     exit(1);
 }
@@ -69,15 +71,21 @@ void error(int id)
 
 /// Helper functions
 
-/// return the exactly time stamp
-std::time_t getTimeStamp()
+/// return the exactly time stamp 
+/// precise: milliseconds
+time_t getTimeStamp()
 {
-    std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> tp =
-        std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
+    chrono::time_point<chrono::system_clock, chrono::milliseconds> tp =
+        chrono::time_point_cast<chrono::milliseconds>(chrono::system_clock::now());
     return tp.time_since_epoch().count();
 }
 
 int main(int argc, char *argv[])
 {
+    time_t start = getTimeStamp();
+    for(int i = 0; i <= 100000000; ++i)
+        ;
+    time_t elspaed = getTimeStamp() - start;
+    cout << elspaed << endl;
     return 0;
 }

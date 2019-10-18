@@ -60,6 +60,19 @@
         "cstring": "cpp",
         "unordered_set": "cpp",
         "algorithm": "cpp",
-        "hash_set": "cpp"
+        "hash_set": "cpp",
+        "condition_variable": "cpp",
+        "cstdarg": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "iterator": "cpp",
+        "map": "cpp",
+        "memory_resource": "cpp",
+        "random": "cpp",
+        "set": "cpp",
+        "mutex": "cpp",
+        "thread": "cpp"
     } // 效果稍好，但太卡，故关掉  
 }
