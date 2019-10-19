@@ -14,6 +14,7 @@ void worker(threadsafe_Heap & Heap, int param)
     Heap.push(param);
 
     for (int i = 0; i < 1000; ++i) {
+        Heap.top();
         Heap.push_and_pop(i * param);
     }
 }
