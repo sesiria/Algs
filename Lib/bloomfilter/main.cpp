@@ -31,14 +31,14 @@ int main(int argc, char** argv)
     }
 
     // 4. check url exist or not
-    char* str = "https://0voice.com/0.html";
+    char* str = "www.github.com/0.html";
     if (0 == BloomFilter_Check(&stBloomFilter, (const void*)str, strlen(str)) ){
-        printf("https://0voice.com/0.html exist\n");
+        printf("https://www.github.com/0.html exist\n");
     }
 
-    char* str2 = "https://0voice.com/10001.html";
+    char* str2 = "https://www.github.com/10001.html";
     if (0 != BloomFilter_Check(&stBloomFilter, (const void*)str2, strlen(str2)) ){
-          printf("https://0voice.com/10001.html not exist\n");
+          printf("https://www.github.com/10001.html not exist\n");
     }
 
     // 5. free bloomfilter
