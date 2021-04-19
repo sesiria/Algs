@@ -21,7 +21,7 @@ int main(int argc, char** argv)
     // 3. 向BloomFilter中新增数值
     char url[128] = {0};
     for(int i = 0; i < ADD_ITEMS; i++){
-        sprintf(url, "https://0voice.com/%d.html", i);
+        sprintf(url, "https://www.github.com/%d.html", i);
         if(0 == BloomFilter_Add(&stBloomFilter, (const void*)url, strlen(url))){
             // printf("add %s success", url);
         }else{
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     }
 
     // 4. check url exist or not
-    char* str = "www.github.com/0.html";
+    char* str = "https://www.github.com/0.html";
     if (0 == BloomFilter_Check(&stBloomFilter, (const void*)str, strlen(str)) ){
         printf("https://www.github.com/0.html exist\n");
     }
