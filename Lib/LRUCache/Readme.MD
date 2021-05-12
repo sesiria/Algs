@@ -2,6 +2,7 @@
 * support C++17 and thread-safe
 * support get(), put(), size(), capacity()
 * the value should be a C++ smart pointer container.
+* add implementation from unordered_map to unordered_set(save about 30% memory cost)
 
 the test case
 
