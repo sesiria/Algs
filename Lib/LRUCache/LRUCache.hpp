@@ -1,15 +1,17 @@
 /**
-* The Least Recent Used Memory Cache Data Structure 
+* The Least Recent Used Memory Cache Data Structure
 * FileName: LRUCache.hpp
 * Author: Sesiria  2021-05-11
 * Support concurrency and thread-safe by STL mutex.
+* Requirement: C++17 or later compiler, otherwise you
+* should used the boost::shared_mutex to replace the std::shared_mutex.
 */
 
 #ifndef LRU_CACHE_HEADER
 #define LRU_CACHE_HEADER
 #include <string>
 #include <algorithm>
-#include <unordered_map>
+#include <unordered_set>
 #include <shared_mutex>
 
 #define DEFAULT_CACHE_CAPACITY	1024	// the default size of the LRU Cache
@@ -21,6 +23,7 @@ template <typename K, typename T>
 class LRUCache
 {
 private:
+	// define the double-linklist node in the LRU queue.
 	struct Linklist
 	{
 		K _key;
@@ -30,11 +33,27 @@ private:
 		// the default constructor.
 		Linklist() :next(nullptr), prev(nullptr) {}
 
-		Linklist(K key, T data) 
+		Linklist(K key, T data)
 			: _key(key), _data(data), next(nullptr), prev(nullptr) {}
 	};
+	
+	// define the custom hash function for the hash set container.
+	struct link_node_hash {
+		size_t operator()(const Linklist* l) const {
+			return std::hash<K>()(l->_key);
+		}
+	};
 
-	std::unordered_map<K, Linklist *> table;	// hashtable to store the buffer by key, value
+	// define the custom equal function for the hash set container.
+	struct link_node_equal {
+		bool operator()(const Linklist* lhs, const Linklist* rhs) const {
+			return lhs->_key == rhs->_key;
+		}
+	};
+
+	// define the hashSet type.
+	using hashSetType = std::unordered_set<Linklist *, link_node_hash, link_node_equal> ;
+	hashSetType hashSet;	// hashtable to store the buffer by key, value
 	std::shared_mutex _mtx;	// mutex object for thread-safe
 	Linklist *head;		// virtual header.
 	Linklist *tail;		// virtual tailer node.
@@ -78,22 +97,22 @@ public:
 	~LRUCache()
 	{
 		clear();
-		if(head)
+		if (head)
 			delete head;
-		if(tail)
+		if (tail)
 			delete tail;
 	}
 
 	// thread safe get buffer data from key
-	bool get(K key, T& val)
+	bool get(const K &key, T& val)
 	{
 		std::unique_lock<std::shared_mutex> lock(_mtx);
-		auto iter = table.find(key);
-		if (iter == table.end())
+		auto iter = hashSet.find((Linklist*)&key);
+		if (iter == hashSet.end())
 			return false;
 		else
 		{
-			Linklist *node = iter->second;
+			Linklist *node = *iter;
 			removeFromList(node);
 			insertToHeader(node);
 			val = node->_data;
@@ -102,39 +121,34 @@ public:
 	}
 
 	// thread safe put data into buffer.
-	void put(K key, T value)
+	void put(const K &key, T value)
 	{
 		std::unique_lock<std::shared_mutex> lock(_mtx);
-		auto iter = table.find(key);
+		// we must used the non-const iterator
+		auto iter = hashSet.find((Linklist*)&key);
 		// the key is already existed.
-		if (iter != table.end())
+		if (iter != hashSet.end())
 		{
-			Linklist *node = iter->second;
-			// allocate the new node and delete the old node
-			Linklist *newNode = new Linklist(key, value);
-			// update the new node into hashtable.
-			iter->second = newNode; 
-			// insert the newNode into the linklist
-			insertToHeader(newNode);
-
-			// cut the old node from linklist and delete it
+			Linklist *node = *iter;
+			node->_data = value; //replace the old value.
+			// move the node from middle to the header.
 			removeFromList(node);
-			delete node;
+			insertToHeader(node);
 		}
 		else
 		{
 			// the LRU cache is full, we remove the last element.
-			if (table.size() == theCapacity)
+			if (hashSet.size() == theCapacity)
 			{
 				Linklist *node = tail->prev;
-				table.erase(node->_key);
+				hashSet.erase((Linklist*)&key);
 				removeFromList(node);
 				delete node;
 			}
 
 			Linklist *newNode = new Linklist(key, value);
 			insertToHeader(newNode);
-			table.insert(std::make_pair(key, newNode));
+			hashSet.insert(newNode);
 		}
 	}
 
@@ -144,7 +158,7 @@ public:
 		std::unique_lock<std::shared_mutex> lock(_mtx);
 		// clear the hashtable
 		// clear the linklist
-		Linklist* p = head->next,  *q;
+		Linklist* p = head->next, *q;
 		while (p && p != tail) {
 			q = p->next;
 			delete p;
@@ -153,13 +167,13 @@ public:
 		// relink the head and tail
 		head->next = tail;
 		tail->prev = head;
-		table.clear();
+		hashSet.clear();
 	}
 
 	// return the current number of elements in the cache
 	size_t size() {
 		std::shared_lock<std::shared_mutex> lock(_mtx);
-		return table.size();
+		return hashSet.size();
 	}
 
 	// return the capacity number of the cache
