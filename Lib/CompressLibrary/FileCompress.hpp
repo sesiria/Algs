@@ -87,7 +87,7 @@ public:
 	void Compress(const char* file) {
 		unsigned long fileSize = getFileSize(file);
 
-		if (fileSize == -1) {
+		if (fileSize == (unsigned long)-1) {
 			fprintf(stderr, "%s invalid file size -1\n", file);
 			return;
 		}
@@ -209,7 +209,7 @@ public:
 		fread(&info, objSize, 1, fin);
 
 		// read until to the end info tag.
-		while (info._count != -1) { 
+		while (info._count != (CountType)-1) { 
 			printf("decodec ch:%u, cout:%u\n", (unsigned char)info._ch, info._count);
 			_infos[(unsigned char)info._ch]._ch = info._ch;
 			_infos[(unsigned char)info._ch]._count = info._count;

@@ -127,7 +127,7 @@ void testLZ77Decompress()
 		std::cout << "test decompress failed!\n";
 }
 
-int main(int argc, char * argv) 
+int main(int argc, char * argv[]) 
 {
 	testLZ77Compress();
 	testLZ77Decompress();
