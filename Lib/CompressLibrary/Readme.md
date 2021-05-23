@@ -6,7 +6,7 @@
 * A file decompress application based on the zlib inflate algorithm  - inflatingStream.h inflatingStream.cpp inflate.cpp
 
 target: 
-LZ77
-fileCompress
-deflate
-inflate
+LZ77  
+fileCompress  
+deflate  
+inflate  
