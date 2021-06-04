@@ -36,7 +36,7 @@ private:
 		Linklist(K key, T data)
 			: _key(key), _data(data), next(nullptr), prev(nullptr) {}
 	};
-	
+
 	// define the custom hash function for the hash set container.
 	struct link_node_hash {
 		size_t operator()(const Linklist* l) const {
@@ -52,7 +52,7 @@ private:
 	};
 
 	// define the hashSet type.
-	using hashSetType = std::unordered_set<Linklist *, link_node_hash, link_node_equal> ;
+	using hashSetType = std::unordered_set<Linklist *, link_node_hash, link_node_equal>;
 	hashSetType hashSet;	// hashtable to store the buffer by key, value
 	std::shared_mutex _mtx;	// mutex object for thread-safe
 	Linklist *head;		// virtual header.
@@ -138,10 +138,10 @@ public:
 		else
 		{
 			// the LRU cache is full, we remove the last element.
-			if (hashSet.size() == theCapacity)
+			while (hashSet.size() >= theCapacity)
 			{
 				Linklist *node = tail->prev;
-				hashSet.erase((Linklist*)&key);
+				hashSet.erase(node);
 				removeFromList(node);
 				delete node;
 			}
@@ -180,6 +180,26 @@ public:
 	size_t capacity() {
 		std::shared_lock<std::shared_mutex> lock(_mtx);
 		return theCapacity;
+	}
+
+	// set the capacity and shrink if needed
+	bool setCapacity(size_t theCapacity) {
+		if (theCapacity == 0)
+		{
+			// invalid capacity value.
+			return false;
+		}
+		std::unique_lock<std::shared_mutex> lock(_mtx);
+		this->theCapacity = theCapacity;
+		// the LRU cache is full, we remove the last element.
+		while (hashSet.size() > theCapacity)
+		{
+			Linklist *node = tail->prev;
+			hashSet.erase(node);
+			removeFromList(node);
+			delete node;
+		}
+		return true;
 	}
 
 };
